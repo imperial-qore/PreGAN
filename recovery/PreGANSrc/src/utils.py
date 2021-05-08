@@ -39,8 +39,8 @@ def load_dataset(folder, model):
 
 def save_model(folder, fname, model, optimizer, epoch, accuracy_list):
 	path = os.path.join(folder, fname)
-	if 'Att' in model.name: print(model.prototype)
-	else: model.prototype = {}
+	# if 'Att' in model.name: print(model.prototype)
+	if 'G' in model.name or 'D' in model.name: model.prototype = {}
 	torch.save({
         'epoch': epoch,
         'model_state_dict': model.state_dict(),

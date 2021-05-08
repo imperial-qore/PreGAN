@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 import statistics
-import os
+import os, glob
 import numpy as np
 from sklearn.manifold import TSNE
 import seaborn as sns
@@ -26,6 +26,7 @@ class Model_Plotter():
 		self.prefix = self.folder + '/' + self.model_name
 		self.epoch = 0
 		os.makedirs(self.folder, exist_ok=True)
+		for f in glob.glob(self.folder + '/*'): os.remove(f)
 		self.tsne = TSNE(n_components=2, perplexity=50, n_iter=1000)
 		self.colors = ['r', 'g', 'b']
 		self.init_params()

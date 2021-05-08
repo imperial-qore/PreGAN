@@ -7,6 +7,8 @@ from .plotter import *
 anomaly_loss = nn.CrossEntropyLoss()
 mse_loss = nn.MSELoss(reduction = 'mean')
 
+num_zero, num_ones = 1, 1
+
 # Model Training
 def triplet_loss(anchor, positive_class, model):
 	global PROTO_UPDATE_FACTOR
@@ -23,19 +25,23 @@ def triplet_loss(anchor, positive_class, model):
 	return loss
 
 def custom_loss(model, source, target_anomaly, target_class):
-	global PROTO_UPDATE_FACTOR
+	global PROTO_UPDATE_FACTOR, num_ones, num_zero
+	nz, no = 0, 0
 	source_anomaly, source_prototype = source
 	aloss, tloss = 0, torch.tensor(0, dtype=torch.double)
 	for i, sa in enumerate(source_anomaly):
-		aloss += anomaly_loss(sa,  torch.tensor([target_anomaly[i]], dtype=torch.long))
+		multiplier = 1 if target_anomaly[i] == 0 else num_zero / num_ones
+		nz += 1 if target_anomaly[i] == 0 else 1; no += 1 if target_anomaly[i] == 1 else 0
+		aloss += anomaly_loss(sa,  torch.tensor([target_anomaly[i]], dtype=torch.long)) * multiplier
 	for i, sp in enumerate(source_prototype):
 		if target_anomaly[i] > 0:
 			tloss += triplet_loss(sp, target_class[i], model)
-	PROTO_UPDATE_FACTOR *= PROTO_FACTOR_DECAY
+	PROTO_UPDATE_FACTOR *= PROTO_FACTOR_DECAY; num_zero += nz; num_ones += no;
 	return aloss, tloss
 
 def backprop(epoch, model, train_time_data, train_schedule_data, anomaly_data, class_data, optimizer, training = True):
-	global PROTO_UPDATE_FACTOR
+	global PROTO_UPDATE_FACTOR, num_ones, num_zero
+	num_zero, num_ones = 1, 1
 	if 'Attention' in model.name:
 		aloss_list, tloss_list = [], []
 		for i in tqdm(range(train_time_data.shape[0]), leave=False, position=1):
@@ -47,7 +53,7 @@ def backprop(epoch, model, train_time_data, train_schedule_data, anomaly_data, c
 				optimizer.zero_grad()
 				loss.backward()
 				optimizer.step()
-		tqdm.write(f'Epoch {epoch},\tLoss = {loss},\tALoss = {np.mean(aloss_list)},\tTLoss = {np.mean(tloss_list)}')
+		tqdm.write(f'Epoch {epoch},\tLoss = {np.mean(aloss_list)+np.mean(tloss_list)},\tALoss = {np.mean(aloss_list)},\tTLoss = {np.mean(tloss_list)}')
 		factor = PROTO_UPDATE_FACTOR + PROTO_UPDATE_MIN
 		return np.mean(aloss_list) + np.mean(tloss_list), factor
 	return
