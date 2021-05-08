@@ -4,16 +4,6 @@ import numpy as np
 from .constants import *
 from .models import *
 
-class color:
-    HEADER = '\033[95m'
-    BLUE = '\033[94m'
-    GREEN = '\033[92m'
-    RED = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-
 def convert_to_windows(data, model):
 	data = torch.tensor(data).double()
 	windows = []; w_size = model.n_window
@@ -47,7 +37,8 @@ def load_dataset(folder, model):
 
 def save_model(folder, fname, model, optimizer, epoch, accuracy_list):
 	path = os.path.join(folder, fname)
-	print(model.prototype)
+	if 'Att' in model.name: print(model.prototype)
+	else: model.prototype = {}
 	torch.save({
         'epoch': epoch,
         'model_state_dict': model.state_dict(),
@@ -73,3 +64,36 @@ def load_model(folder, fname, modelname):
 		print(f"{color.GREEN}Creating new model: {model.name}{color.ENDC}")
 		epoch = -1; accuracy_list = []
 	return model, optimizer, epoch, accuracy_list
+
+def load_gan(folder, gfname, dfname, gmodelname, dmodelname):
+	gmodel, gopt, epoch, accuracy_list = load_model(folder, gfname, gmodelname)
+	dmodel, dopt, _, _ = load_model(folder, gfname, dmodelname)
+	return gmodel, dmodel, gopt, dopt, epoch, accuracy_list
+
+def save_gan(folder, gfname, dfname, gmodel, dmodel, gopt, dopt, epoch, accuracy_list):
+	save_model(folder, gfname, gmodel, gopt, epoch, accuracy_list)
+	save_model(folder, dfname, dmodel, dopt, 0, [])
+
+# Misc
+def run_simulation(stats, schedule_data):
+    e, r = stats.runSimulation(schedule_data)
+    score = Coeff_Energy * e + Coeff_Latency * r
+    return score
+
+def freeze(model):
+    for name, p in model.named_parameters():
+        p.requires_grad = False
+
+def unfreeze(model):
+    for name, p in model.named_parameters():
+        p.requires_grad = True
+
+class color:
+    HEADER = '\033[95m'
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    RED = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'

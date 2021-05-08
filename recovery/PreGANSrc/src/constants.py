@@ -11,3 +11,7 @@ PROTO_DIM = 2
 PROTO_UPDATE_FACTOR = 0.5
 PROTO_UPDATE_MIN = 0.2
 PROTO_FACTOR_DECAY = 0.999
+
+# GAN parameters
+Coeff_Energy = 0.8
+Coeff_Latency = 0.2

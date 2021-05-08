@@ -2,15 +2,36 @@ import sys
 sys.path.append('recovery/PreGANSrc/')
 
 import numpy as np
+from copy import deepcopy
 from .Recovery import *
 from .PreGANSrc.src.constants import *
 from .PreGANSrc.src.utils import *
 from .PreGANSrc.src.train import *
 
 class PreGANRecovery(Recovery):
-    def __init__(self, hosts):
+    def __init__(self, hosts, env, training = False):
         super().__init__()
         self.model_name = f'Attention_{hosts}'
+        self.gen_name = f'Gen_{hosts}'
+        self.disc_name = f'Disc_{hosts}'
+        self.env_name = 'simulator' if env == '' else 'framework'
+        self.training = training
+        self.load_models()
+
+    def load_models(self):
+        # Load encoder model
+        self.model, self.optimizer, self.epoch, self.accuracy_list = \
+            load_model(model_folder, f'{self.env_name}_{self.model_name}.ckpt', self.model_name)
+        # Train the model is not trained
+        if self.epoch == -1: self.train_model()
+        # Freeze encoder
+        freeze(self.model)
+        # Load generator and discriminator
+        self.gen, self.disc, self.gopt, self.dopt, self.epoch, self.accuracy_list = \
+            load_gan(model_folder, f'{self.env_name}_{self.gen_name}.ckpt', f'{self.env_name}_{self.disc_name}.ckpt', self.gen_name, self.disc_name) 
+        # Freeze GAN if not training
+        if not self.training: freeze(self.gen); freeze(self.disc)
+        if self.training: self.ganloss = nn.BCELoss()
 
     def train_model(self):
         folder = os.path.join(data_folder, self.env_name)
@@ -22,20 +43,57 @@ class PreGANRecovery(Recovery):
             self.accuracy_list.append((loss, factor, anomaly_score, class_score))
             save_model(model_folder, f'{self.env_name}_{self.model_name}.ckpt', self.model, self.optimizer, self.epoch, self.accuracy_list)
 
-    def run_model(self, time_series, original_decision):
-        # Load model
-        self.model, self.optimizer, self.epoch, self.accuracy_list = \
-            load_model(model_folder, f'{self.env_name}_{self.model_name}.ckpt', self.model_name)
-        # Train the model is not trained
-        if self.epoch == -1:
-            self.train_model()
-        # Freeze encoder
-        for name, p in self.model.named_parameters():
-            if 'encoder' in name: p.requires_grad = False
-        time_data, schedule_data = self.env.stats.time_series, torch.tensor(self.env.scheduler.result_cache).double()
+    def train_gan(self, embedding, schedule_data):
+        # Train generator
+        self.gopt.zero_grad()
+        new_schedule_data = self.gen(embedding, schedule_data)
+        probs = self.disc(schedule_data, new_schedule_data)
+        true_probs = torch.tensor([0, 1], dtype=torch.double) # to enforce new schedule is better than original schedule
+        gen_loss = self.ganloss(probs, true_probs)
+        gen_loss.backward(); self.gopt.step()
+        # Train discriminator
+        self.dopt.zero_grad()
+        new_schedule_data = self.gen(embedding, schedule_data)
+        probs = self.disc(schedule_data, new_schedule_data.detach())
+        new_score, orig_score = run_simulation(self.env.stats, new_schedule_data), run_simulation(self.env.stats, schedule_data)
+        true_probs = torch.tensor([0, 1], dtype=torch.double) if new_score <= orig_score else torch.tensor([1, 0], dtype=torch.double)
+        disc_loss = self.ganloss(probs, true_probs)
+        disc_loss.backward(); self.dopt.step()
+        self.epoch += 1; self.accuracy_list.append((gen_loss.item(), disc_loss.item()))
+        print(f'{color.HEADER}Epoch {self.epoch},\tGLoss = {gen_loss.item()},\tDLoss = {disc_loss.item()}{color.ENDC}')
+        save_gan(model_folder, f'{self.env_name}_{self.gen_name}.ckpt', f'{self.env_name}_{self.disc_name}.ckpt', \
+                self.gen, self.disc, self.gopt, self.dopt, self.epoch, self.accuracy_list)
+
+    def recover_decision(self, embedding, original_decision):
+        new_schedule_data = self.gen(embedding, schedule_data)
+        probs = self.disc(schedule_data, new_schedule_data)
+        if probs[0] > probs[1]: # original better
+            return original_decision
+        # Form new decision
+        host_alloc = []; container_alloc = [-1] * len(self.env.hostlist)
+        for i in range(len(self.env.hostlist)): host_alloc.append([])
+        for c in self.env.containerlist:
+            if c and c.getHostID() != -1: 
+                host_alloc[c.getHostID()].append(c.id) 
+                container_alloc[c.id] = c.getHostID()
+        decision_dict = dict(original_decision)
+        for cid in np.concatenate(host_alloc):
+            one_hot = schedule_data[cid].tolist()
+            new_host = one_hot.index(max(one_hot))
+            if container_alloc[cid] != new_host: decision_dict[cid] = new_host
+        return list(decision_dict.items())
+
+    def run_encoder(self, schedule_data):
+        # Get latest data from Stat
+        time_data = self.env.stats.time_series
         if time_data.shape[0] >= self.model.n_window: time_data = time_data[-self.model.n_window:]
         time_data = convert_to_windows(time_data, self.model)[-1]
-        anomaly, prototype = self.model(time_data, schedule_data)
+        return self.model(time_data, schedule_data)
+
+    def run_model(self, time_series, original_decision):
+        # Run encoder
+        schedule_data = torch.tensor(self.env.scheduler.result_cache).double()
+        anomaly, prototype = self.run_encoder(schedule_data)
         # If no anomaly predicted, return original decision 
         for a in anomaly:
             prediction = torch.argmax(a).item() 
@@ -45,5 +103,9 @@ class PreGANRecovery(Recovery):
         # Form prototype vectors for diagnosed hosts
         embedding = [torch.zeros_like(p) if torch.argmax(anomaly[i]).item() == 0 else p for i, p in enumerate(prototype)]
         embedding = torch.stack(embedding)
-        print(embedding)
+        # Pass through GAN
+        if self.training:
+            self.train_gan(embedding, schedule_data)
+            return original_decision
+        return self.recover_decision(embedding, schedule_data, original_decision)
 

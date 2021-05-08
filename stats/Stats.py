@@ -149,6 +149,31 @@ class Stats():
 			energytotalinterval_pred += self.env.hostlist[hid].getPowerFromIPS(ips)
 		return energytotalinterval_pred*self.env.intervaltime, max(0, np.mean([metric_d['avgresponsetime'] for metric_d in self.metrics[-5:]]))
 
+	def runSimulation(self, schedule_data):
+		host_alloc = []; container_alloc = [-1] * len(self.env.hostlist)
+		for i in range(len(self.env.hostlist)): host_alloc.append([])
+		for c in self.env.containerlist:
+			if c and c.getHostID() != -1: 
+				host_alloc[c.getHostID()].append(c.id) 
+				container_alloc[c.id] = c.getHostID()
+		decision = []
+		for cid in np.concatenate(host_alloc):
+			cid = int(cid)
+			one_hot = schedule_data[cid].tolist()
+			new_host = one_hot.index(max(one_hot))
+			if container_alloc[cid] != new_host: decision.append((cid, new_host))
+		decision = self.simulated_scheduler.filter_placement(decision)
+		for cid, hid in decision:
+			if self.env.getPlacementPossible(cid, hid) and container_alloc[cid] != -1:
+				host_alloc[container_alloc[cid]].remove(cid)
+				host_alloc[hid].append(cid)
+		energytotalinterval_pred = 0
+		for hid, cids in enumerate(host_alloc):
+			ips = 0
+			for cid in cids: ips += self.env.containerlist[cid].getApparentIPS()
+			energytotalinterval_pred += self.env.hostlist[hid].getPowerFromIPS(ips)
+		return energytotalinterval_pred*self.env.intervaltime, max(0, np.mean([metric_d['avgresponsetime'] for metric_d in self.metrics[-5:]]))
+
 	########################################################################################################
 
 	def generateGraphsWithInterval(self, dirname, listinfo, obj, metric, metric2=None):
