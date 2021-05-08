@@ -50,7 +50,7 @@ from scheduler.HSOGOBI import HSOGOBIScheduler
 from scheduler.HSOGOBI2 import HSOGOBI2Scheduler
 
 # Recovery imports
-from recovery.PreNet import PreNetRecovery
+from recovery.PreGAN import PreGANRecovery
 
 # Auxiliary imports
 from stats.Stats import *
@@ -108,7 +108,7 @@ def initalizeEnvironment(environment, logger):
 	
 	# Initialize recovery
 	''' Can be PreNetRecovery '''
-	recovery = PreNetRecovery(HOSTS)
+	recovery = PreGANRecovery(HOSTS)
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()

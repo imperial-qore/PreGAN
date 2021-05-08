@@ -56,9 +56,9 @@ def save_model(folder, fname, model, optimizer, epoch, accuracy_list):
         'accuracy_list': accuracy_list}, path)
 
 def load_model(folder, fname, modelname):
-	import recovery.PreNetSrc.src.models
+	import recovery.PreGANSrc.src.models
 	path = os.path.join(folder, fname)
-	model_class = getattr(recovery.PreNetSrc.src.models, modelname)
+	model_class = getattr(recovery.PreGANSrc.src.models, modelname)
 	model = model_class().double()
 	optimizer = torch.optim.AdamW(model.parameters() , lr=model.lr, weight_decay=1e-5)
 	if os.path.exists(path):

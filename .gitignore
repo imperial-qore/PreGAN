@@ -137,3 +137,4 @@ dmypy.json
 .pyre/
 todo.txt
 recovery/PreNetSrc/checkpoints/simulator_Attention_50.ckpt
+recovery/PreGANSrc/checkpoints/simulator_Attention_50.ckpt

@@ -1,6 +1,6 @@
 # Directory paths
-model_folder = 'recovery/PreNetSrc/checkpoints/'
-data_folder = 'recovery/PreNetSrc/data/'
+model_folder = 'recovery/PreGANSrc/checkpoints/'
+data_folder = 'recovery/PreGANSrc/data/'
 data_filename = 'time_series.npy'
 schedule_filename = 'schedule_series.npy'
 

@@ -1,13 +1,13 @@
 import sys
-sys.path.append('recovery/PreNetSrc/')
+sys.path.append('recovery/PreGANSrc/')
 
 import numpy as np
 from .Recovery import *
-from .PreNetSrc.src.constants import *
-from .PreNetSrc.src.utils import *
-from .PreNetSrc.src.train import *
+from .PreGANSrc.src.constants import *
+from .PreGANSrc.src.utils import *
+from .PreGANSrc.src.train import *
 
-class PreNetRecovery(Recovery):
+class PreGANRecovery(Recovery):
     def __init__(self, hosts):
         super().__init__()
         self.model_name = f'Attention_{hosts}'
