@@ -12,10 +12,12 @@ class Framework():
 	# Total power in watt
 	# Total Router Bw
 	# Interval Time in seconds
-	def __init__(self, Scheduler, ContainerLimit, IntervalTime, hostinit, database, env, logger):
+	def __init__(self, Scheduler, Recovery, ContainerLimit, IntervalTime, hostinit, database, env, logger):
 		self.hostlimit = len(hostinit)
 		self.scheduler = Scheduler
 		self.scheduler.setEnvironment(self)
+		self.recovery = Recovery
+		self.recovery.setEnvironment(self)
 		self.containerlimit = ContainerLimit
 		self.hostlist = []
 		self.containerlist = []

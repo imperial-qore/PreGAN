@@ -3,6 +3,7 @@ sys.path.append('scheduler/BaGTI/')
 
 from .Scheduler import *
 from .BaGTI.train import *
+from copy import deepcopy
 
 class GOBIScheduler(Scheduler):
 	def __init__(self, data_type):
@@ -11,6 +12,7 @@ class GOBIScheduler(Scheduler):
 		self.model, _, _, _ = load_model(data_type, self.model, data_type)
 		self.data_type = data_type
 		self.hosts = int(data_type.split('_')[-1])
+		self.result_cache = None
 		dtl = data_type.split('_')
 		_, _, self.max_container_ips = eval("load_"+'_'.join(dtl[:-1])+"_data("+dtl[-1]+")")
 
@@ -31,6 +33,7 @@ class GOBIScheduler(Scheduler):
 		init = np.concatenate((cpu, alloc), axis=1)
 		init = torch.tensor(init, dtype=torch.float, requires_grad=True)
 		result, iteration, fitness = opt(init, self.model, [], self.data_type)
+		self.result_cache = result[:, -self.hosts:].numpy()
 		decision = []
 		for cid in prev_alloc:
 			one_hot = result[cid, -self.hosts:].tolist()

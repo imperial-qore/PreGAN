@@ -136,3 +136,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 todo.txt
+recovery/PreNetSrc/checkpoints/simulator_Attention_50.ckpt

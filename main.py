@@ -49,6 +49,9 @@ from scheduler.HGOBI2 import HGOBI2Scheduler
 from scheduler.HSOGOBI import HSOGOBIScheduler
 from scheduler.HSOGOBI2 import HSOGOBI2Scheduler
 
+# Recovery imports
+from recovery.PreNet import PreNetRecovery
+
 # Auxiliary imports
 from stats.Stats import *
 from utils.Utils import *
@@ -101,14 +104,18 @@ def initalizeEnvironment(environment, logger):
 	
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI (arg = 'energy_latency_'+str(HOSTS)) '''
-	scheduler = RandomScheduler() # GOBIScheduler('energy_latency_'+str(HOSTS))
+	scheduler = GOBIScheduler('energy_latency_'+str(HOSTS)) # GOBIScheduler('energy_latency_'+str(HOSTS))
+	
+	# Initialize recovery
+	''' Can be PreNetRecovery '''
+	recovery = PreNetRecovery(HOSTS)
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
 	if environment != '':
-		env = Framework(scheduler, CONTAINERS, INTERVAL_TIME, hostlist, db, environment, logger)
+		env = Framework(scheduler, recovery, CONTAINERS, INTERVAL_TIME, hostlist, db, environment, logger)
 	else:
-		env = Simulator(TOTAL_POWER, ROUTER_BW, scheduler, CONTAINERS, INTERVAL_TIME, hostlist)
+		env = Simulator(TOTAL_POWER, ROUTER_BW, scheduler, recovery, CONTAINERS, INTERVAL_TIME, hostlist)
 
 	# Execute first step
 	newcontainerinfos = workload.generateNewContainers(env.interval) # New containers info
@@ -126,9 +133,9 @@ def initalizeEnvironment(environment, logger):
 	# Initialize stats
 	stats = Stats(env, workload, datacenter, scheduler)
 	stats.saveStats(deployed, migrations, [], deployed, decision, schedulingTime)
-	return datacenter, workload, scheduler, env, stats
+	return datacenter, workload, scheduler, recovery, env, stats
 
-def stepSimulation(workload, scheduler, env, stats):
+def stepSimulation(workload, scheduler, recovery, env, stats):
 	newcontainerinfos = workload.generateNewContainers(env.interval) # New containers info
 	if opts.env != '': print(newcontainerinfos)
 	deployed, destroyed = env.addContainers(newcontainerinfos) # Deploy new containers and get container IDs
@@ -136,6 +143,7 @@ def stepSimulation(workload, scheduler, env, stats):
 	selected = scheduler.selection() # Select container IDs for migration
 	decision = scheduler.filter_placement(scheduler.placement(selected+deployed)) # Decide placement for selected container ids
 	schedulingTime = time() - start
+	recovered_decision = recovery.run_model(stats.time_series, decision)
 	migrations = env.simulationStep(decision) # Schedule containers
 	workload.updateDeployedContainers(env.getCreationIDs(migrations, deployed)) # Update workload deployed using creation IDs
 	print("Deployed containers' creation IDs:", env.getCreationIDs(migrations, deployed))
@@ -214,11 +222,11 @@ if __name__ == '__main__':
 			print(HOSTS_IP)
 		# exit()
 
-	datacenter, workload, scheduler, env, stats = initalizeEnvironment(env, logger)
+	datacenter, workload, scheduler, recovery, env, stats = initalizeEnvironment(env, logger)
 
 	for step in range(NUM_SIM_STEPS):
 		print(color.BOLD+"Simulation Interval:", step, color.ENDC)
-		stepSimulation(workload, scheduler, env, stats)
+		stepSimulation(workload, scheduler, recovery, env, stats)
 		if env != '' and step % 10 == 0: saveStats(stats, datacenter, workload, env, end = False)
 
 	if opts.env != '':
