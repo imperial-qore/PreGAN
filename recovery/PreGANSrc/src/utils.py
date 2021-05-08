@@ -15,12 +15,13 @@ def convert_to_windows(data, model):
 
 def form_test_dataset(data):
 	anomaly_per_dim = data > np.percentile(data, PERCENTILES, axis=0)
-	anomaly_any_dim = np.logical_or.reduce(anomaly_per_dim, axis=1)
-	anomaly_which_dim = []
+	anomaly_which_dim, anomaly_any_dim = [], []
 	for i in range(0, data.shape[1], 3):
 		anomaly_which_dim.append(np.argmax(data[:, i:i+3] + 0, axis=1))
-	anomaly_which_dim = np.stack(anomaly_which_dim).transpose()
-	return anomaly_per_dim + 0, anomaly_which_dim
+		anomaly_any_dim.append(np.logical_or.reduce(anomaly_per_dim[:, i:i+3], axis=1))
+	anomaly_any_dim = np.stack(anomaly_any_dim, axis=1)
+	anomaly_which_dim = np.stack(anomaly_which_dim, axis=1)
+	return anomaly_any_dim + 0, anomaly_which_dim
 
 def load_npyfile(folder, fname):
 	path = os.path.join(folder, fname)
@@ -30,6 +31,7 @@ def load_npyfile(folder, fname):
 
 def load_dataset(folder, model):
 	time_data = load_npyfile(folder, data_filename)
+	time_data = normalize_time_data(time_data) # Normalize data
 	train_schedule_data = torch.tensor(load_npyfile(folder, schedule_filename)).double()
 	train_time_data = convert_to_windows(time_data, model)
 	anomaly_data, class_data = form_test_dataset(time_data)
@@ -56,7 +58,8 @@ def load_model(folder, fname, modelname):
 		print(f"{color.GREEN}Loading pre-trained model: {model.name}{color.ENDC}")
 		checkpoint = torch.load(path)
 		model.load_state_dict(checkpoint['model_state_dict'])
-		model.prototypes = checkpoint['model_prototypes']
+		model.prototype = checkpoint['model_prototypes']
+		if 'Att' in model.name: print(model.prototype)
 		optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 		epoch = checkpoint['epoch']
 		accuracy_list = checkpoint['accuracy_list']
@@ -75,6 +78,9 @@ def save_gan(folder, gfname, dfname, gmodel, dmodel, gopt, dopt, epoch, accuracy
 	save_model(folder, dfname, dmodel, dopt, 0, [])
 
 # Misc
+def normalize_time_data(time_data):
+	return time_data / (np.max(time_data, axis = 0) + 1e-8) 
+
 def run_simulation(stats, schedule_data):
     e, r = stats.runSimulation(schedule_data)
     score = Coeff_Energy * e + Coeff_Latency * r

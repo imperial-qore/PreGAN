@@ -16,6 +16,7 @@ class PreGANRecovery(Recovery):
         self.disc_name = f'Disc_{hosts}'
         self.env_name = 'simulator' if env == '' else 'framework'
         self.training = training
+        self.model_plotter = Model_Plotter(self.env_name, self.model_name)
         self.load_models()
 
     def load_models(self):
@@ -38,9 +39,10 @@ class PreGANRecovery(Recovery):
         train_time_data, train_schedule_data, anomaly_data, class_data = load_dataset(folder, self.model)
         for self.epoch in tqdm(range(self.epoch+1, self.epoch+num_epochs+1), position=0):
             loss, factor = backprop(self.epoch, self.model, train_time_data, train_schedule_data, anomaly_data, class_data, self.optimizer)
-            anomaly_score, class_score = accuracy(self.model, train_time_data, train_schedule_data, anomaly_data, class_data)
+            anomaly_score, class_score = accuracy(self.model, train_time_data, train_schedule_data, anomaly_data, class_data, self.model_plotter)
             tqdm.write(f'Epoch {self.epoch},\tFactor = {factor},\tAScore = {anomaly_score},\tCScore = {class_score}')
             self.accuracy_list.append((loss, factor, anomaly_score, class_score))
+            self.model_plotter.plot(self.accuracy_list, self.epoch)
             save_model(model_folder, f'{self.env_name}_{self.model_name}.ckpt', self.model, self.optimizer, self.epoch, self.accuracy_list)
 
     def train_gan(self, embedding, schedule_data):
@@ -86,6 +88,7 @@ class PreGANRecovery(Recovery):
     def run_encoder(self, schedule_data):
         # Get latest data from Stat
         time_data = self.env.stats.time_series
+        time_data = normalize_time_data(time_data)
         if time_data.shape[0] >= self.model.n_window: time_data = time_data[-self.model.n_window:]
         time_data = convert_to_windows(time_data, self.model)[-1]
         return self.model(time_data, schedule_data)

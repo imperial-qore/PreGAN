@@ -2,6 +2,7 @@ from .constants import *
 from .utils import *
 import torch.nn as nn
 from tqdm import tqdm
+from .plotter import *
 
 anomaly_loss = nn.CrossEntropyLoss()
 mse_loss = nn.MSELoss(reduction = 'mean')
@@ -51,18 +52,19 @@ def backprop(epoch, model, train_time_data, train_schedule_data, anomaly_data, c
 		return np.mean(aloss_list) + np.mean(tloss_list), factor
 	return
 
-
 # Accuracy 
-def anomaly_accuracy(source_anomaly, target_anomaly):
-	correct = 0
+def anomaly_accuracy(source_anomaly, target_anomaly, model_plotter):
+	correct = 0; res_list = []
 	for i, sa in enumerate(source_anomaly):
 		res = torch.argmax(sa).item() 
+		res_list.append(res)
 		if res == target_anomaly[i]:
 			correct += 1
+	model_plotter.update_anomaly(res_list, target_anomaly, correct/len(source_anomaly))
 	return correct/len(source_anomaly)
 
-def class_accuracy(source_prototype, target_anomaly, target_class, model):
-	correct, total = 0, 1e-4
+def class_accuracy(source_prototype, target_anomaly, target_class, model, model_plotter):
+	correct, total = 0, 1e-4; prototypes = []
 	for i, sp in enumerate(source_prototype):
 		if target_anomaly[i] > 0:
 			total += 1
@@ -74,16 +76,18 @@ def class_accuracy(source_prototype, target_anomaly, target_class, model):
 				negative_loss.append(mse_loss(sp, model.prototype[nc]))
 			if positive_loss <= negative_loss[0] and positive_loss <= negative_loss[1]:
 				correct += 1
+			prototypes.append((sp, target_class[i]))
+	model_plotter.update_class(prototypes, correct/total)
 	return correct / total
 
-def accuracy(model, train_time_data, train_schedule_data, anomaly_data, class_data):
+def accuracy(model, train_time_data, train_schedule_data, anomaly_data, class_data, model_plotter):
 	anomaly_correct, class_correct, class_total = 0, 0, 0
 	for i, d in enumerate(train_time_data):
 		output = model(train_time_data[i], train_schedule_data[i])
 		source_anomaly, source_prototype = output
-		anomaly_correct += anomaly_accuracy(source_anomaly, anomaly_data[i])
+		anomaly_correct += anomaly_accuracy(source_anomaly, anomaly_data[i], model_plotter)
 		if np.sum(anomaly_data[i]) > 0:
 			class_total += 1
-			class_correct += class_accuracy(source_prototype, anomaly_data[i], class_data[i], model)
+			class_correct += class_accuracy(source_prototype, anomaly_data[i], class_data[i], model, model_plotter)
 	return anomaly_correct / len(train_time_data), class_correct / class_total
 

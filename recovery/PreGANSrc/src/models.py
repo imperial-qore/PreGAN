@@ -30,7 +30,7 @@ class Attention_50(nn.Module):
 			nn.Linear(self.n_hidden,self.n_hidden), nn.ReLU(True),
 			nn.Linear(self.n_hidden, PROTO_DIM), nn.Sigmoid(),
 		)
-		self.prototype = [torch.zeros(PROTO_DIM, requires_grad=False, dtype=torch.double) for _ in range(3)]
+		self.prototype = [torch.rand(PROTO_DIM, requires_grad=False, dtype=torch.double) for _ in range(3)]
 
 	def encode(self, t, s):
 		for at in self.encoder_atts:
