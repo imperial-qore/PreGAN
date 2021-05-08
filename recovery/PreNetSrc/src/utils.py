@@ -47,6 +47,7 @@ def load_dataset(folder, model):
 
 def save_model(folder, fname, model, optimizer, epoch, accuracy_list):
 	path = os.path.join(folder, fname)
+	print(model.prototype)
 	torch.save({
         'epoch': epoch,
         'model_state_dict': model.state_dict(),
@@ -56,12 +57,13 @@ def save_model(folder, fname, model, optimizer, epoch, accuracy_list):
 
 def load_model(folder, fname, modelname):
 	import recovery.PreNetSrc.src.models
+	path = os.path.join(folder, fname)
 	model_class = getattr(recovery.PreNetSrc.src.models, modelname)
 	model = model_class().double()
 	optimizer = torch.optim.AdamW(model.parameters() , lr=model.lr, weight_decay=1e-5)
-	if os.path.exists(fname):
+	if os.path.exists(path):
 		print(f"{color.GREEN}Loading pre-trained model: {model.name}{color.ENDC}")
-		checkpoint = torch.load(fname)
+		checkpoint = torch.load(path)
 		model.load_state_dict(checkpoint['model_state_dict'])
 		model.prototypes = checkpoint['model_prototypes']
 		optimizer.load_state_dict(checkpoint['optimizer_state_dict'])

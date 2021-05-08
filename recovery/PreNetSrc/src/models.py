@@ -17,7 +17,7 @@ class Attention_50(nn.Module):
 		self.n = self.n_window * self.n_feats + self.n_hosts * self.n_hosts
 		self.atts = [ nn.Sequential( nn.Linear(self.n, self.n_feats * self.n_feats), 
 				nn.ReLU(True))	for i in range(1)]
-		self.atts = nn.ModuleList(self.atts)
+		self.encoder_atts = nn.ModuleList(self.atts)
 		self.encoder = nn.Sequential(
 			nn.Linear(self.n_window * self.n_feats, self.n_hosts * self.n_latent), nn.ReLU(True),
 		)
@@ -30,10 +30,10 @@ class Attention_50(nn.Module):
 			nn.Linear(self.n_hidden,self.n_hidden), nn.ReLU(True),
 			nn.Linear(self.n_hidden, PROTO_DIM), nn.Sigmoid(),
 		)
-		self.prototype = [torch.zeros(PROTO_DIM, dtype=torch.double) for _ in range(3)]
+		self.prototype = [torch.zeros(PROTO_DIM, requires_grad=False, dtype=torch.double) for _ in range(3)]
 
 	def encode(self, t, s):
-		for at in self.atts:
+		for at in self.encoder_atts:
 			inp = torch.cat((t.view(-1), s.view(-1)))
 			ats = at(inp).reshape(self.n_feats, self.n_feats)
 			t = torch.matmul(t, ats)	
