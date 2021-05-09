@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib.colors import LinearSegmentedColormap
 import statistics
 import os, glob
 import numpy as np
@@ -22,7 +22,7 @@ class Model_Plotter():
 	def __init__(self, env, modelname):
 		self.env = env
 		self.model_name = modelname
-		self.folder = os.path.join(plot_folder, env)
+		self.folder = os.path.join(plot_folder, env, 'model')
 		self.prefix = self.folder + '/' + self.model_name
 		self.epoch = 0
 		os.makedirs(self.folder, exist_ok=True)
@@ -93,8 +93,8 @@ class Model_Plotter():
 		ax1.set_ylabel(name1)
 		ax1.set_xlabel('Timestamp')
 		yticks = np.linspace(0, 50, 10, dtype=np.int)
-		h1 = sns.heatmap(data1,cmap="YlGnBu", yticklabels=yticks, linewidth=0.01, ax = ax1)
-		h2 = sns.heatmap(data2,cmap="YlGnBu", yticklabels=yticks, linewidth=0.01, ax = ax2)
+		h1 = sns.heatmap(data1.transpose(),cmap="YlGnBu", yticklabels=yticks, linewidth=0.01, ax = ax1)
+		h2 = sns.heatmap(data2.transpose(),cmap="YlGnBu", yticklabels=yticks, linewidth=0.01, ax = ax2)
 		ax1.set_yticks(yticks); ax2.set_yticks(yticks)
 		ax2.set_xlabel('Timestamp')
 		ax2.set_ylabel(name2)
@@ -111,3 +111,104 @@ class Model_Plotter():
 		fig.savefig(self.prefix2 + f'tsne_{name1}.pdf')
 		plt.close()
 
+class GAN_Plotter():
+	def __init__(self, env, gname, dname):
+		self.env = env
+		self.gname, self.dname = gname, dname
+		self.folder = os.path.join(plot_folder, env, 'gan')
+		self.prefix = self.folder + '/' + self.gname + '_' + self.dname
+		self.epoch = 0
+		os.makedirs(self.folder, exist_ok=True)
+		for f in glob.glob(self.folder + '/*'): os.remove(f)
+		self.init_params()
+
+	def init_params(self):
+		self.anomaly_detected = []
+		self.class_detected = []
+		self.new_better = []
+		self.hosts_migrated = []
+		self.migrating = []
+		self.new_score_better = []
+
+	def update_anomaly_detected(self, detected):
+		self.anomaly_detected.append(detected)
+
+	def update_class_detected(self, detected):
+		print(detected)
+		self.class_detected.append(detected)
+
+	def new_better(self, new_better):
+		self.new_better.append(new_better + 0)
+		if not new_better: 
+			self.hosts_migrated.append([0] * int(self.gname.split('_')[1]))
+			self.migrating.append(0)
+
+	def plot_test(self, hosts_from):
+		self.migrating.append((np.sum(hosts_from) > 0) + 0)
+		self.hosts_migrated.append(hosts_from)
+		self.prefix2 = self.prefix + '_Test_' + str(self.epoch) + '_'
+		self.epoch += 1
+		self.plot_heatmap('Anomaly Scores', 'Detection', 'Class', np.array(self.anomaly_detected).reshape(1, -1), np.array(self.class_detected))
+		self.plot_heatmapc('Migrations', 'AnyMigrated', 'Hosts_from', np.array(self.migrating), np.array(self.hosts_migrated))
+
+	def plot(self, accuracy_list, epoch, ns, os):
+		self.prefix2 = self.prefix + '_' + str(self.epoch) + '_'
+		self.epoch += 1
+		self.gloss_list = [i[0] for i in accuracy_list]
+		self.dloss_list = [i[1] for i in accuracy_list]
+		self.new_score_better.append((ns <= os) + 0)
+		self.plot2('GLoss', 'DLoss', self.gloss_list, self.dloss_list)
+		self.plot1('New Score Better', self.new_score_better)
+		self.plot_heatmap('Anomaly Scores', 'Detection', 'Class', np.array(self.anomaly_detected).reshape(1, -1), np.array(self.class_detected))
+
+	def plot1(self, name1, data1, smooth = True, xlabel='Epoch'):
+		if smooth: data1 = smoother(data1)
+		fig, ax = plt.subplots(1, 1)
+		ax.set_ylabel(name1)
+		ax.plot(data1, linewidth=0.2)
+		ax.set_xlabel(xlabel)
+		fig.savefig(self.prefix2 + f'{name1}.pdf')
+		plt.close()
+
+	def plot2(self, name1, name2, data1, data2, smooth = True, xlabel='Epoch'):
+		if smooth: data1, data2 = smoother(data1), smoother(data2)
+		fig, ax = plt.subplots(1, 1)
+		ax.set_ylabel(name1)
+		ax.plot(data1, linewidth=0.2)
+		ax2 = ax.twinx()
+		ax2.plot(data2, '--', linewidth=0.3, alpha=0.5)
+		ax2.set_xlabel(xlabel)
+		ax2.set_ylabel(name2)
+		fig.savefig(self.prefix2 + f'{name1}_{name2}.pdf')
+		plt.close()
+
+	def plot_heatmap(self, title, name1, name2, data1, data2):
+		fig, (ax1, ax2) = plt.subplots(2, 1)
+		ax1.set_title(title)
+		ax1.set_ylabel(name1)
+		ax1.set_xlabel('Timestamp')
+		yticks = np.linspace(0, 50, 10, dtype=np.int)
+		h1 = sns.heatmap(data1,cmap="YlGnBu", yticklabels=[0], linewidth=0.01, ax = ax1)
+		dcmap = LinearSegmentedColormap.from_list('Custom', ['w', 'r', 'g', 'b'], 4)
+		data2 = (data2 + 1).transpose()
+		h2 = sns.heatmap(data2,cmap=dcmap, yticklabels=yticks, linewidth=0.01, ax = ax2, vmin=0, vmax=3)
+		colorbar = h2.collections[0].colorbar; colorbar.set_ticklabels(['None', 'CPU', 'RAM', 'Disk'])
+		ax1.set_yticks([0]); ax2.set_yticks(yticks)
+		ax2.set_xlabel('Timestamp')
+		ax2.set_ylabel(name2)
+		fig.savefig(self.prefix2 + f'{title}_{name1}_{name2}.pdf')
+		plt.close()
+
+	def plot_heatmapc(self, title, name1, name2, data1, data2):
+		fig, (ax1, ax2) = plt.subplots(2, 1)
+		ax1.set_title(title)
+		ax1.set_ylabel(name1)
+		ax1.set_xlabel('Timestamp')
+		yticks = np.linspace(0, 50, 10, dtype=np.int)
+		h1 = sns.heatmap(data1,cmap="YlGnBu", yticklabels=yticks, linewidth=0.01, ax = ax1)
+		h2 = sns.heatmap(data2,cmap="YlGnBu", yticklabels=yticks, linewidth=0.01, ax = ax2)
+		ax1.set_yticks(yticks); ax2.set_yticks(yticks)
+		ax2.set_xlabel('Timestamp')
+		ax2.set_ylabel(name2)
+		fig.savefig(self.prefix2 + f'{title}_{name1}_{name2}.pdf')
+		plt.close()

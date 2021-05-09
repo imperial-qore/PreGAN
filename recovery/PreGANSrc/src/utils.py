@@ -59,6 +59,7 @@ def load_model(folder, fname, modelname):
 		checkpoint = torch.load(path)
 		model.load_state_dict(checkpoint['model_state_dict'])
 		model.prototype = checkpoint['model_prototypes']
+		for p in model.prototype: p.requires_grad = False
 		if 'Att' in model.name: print(model.prototype)
 		optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 		epoch = checkpoint['epoch']
@@ -81,25 +82,37 @@ def save_gan(folder, gfname, dfname, gmodel, dmodel, gopt, dopt, epoch, accuracy
 def normalize_time_data(time_data):
 	return time_data / (np.max(time_data, axis = 0) + 1e-8) 
 
+def normalize_test_time_data(time_data, train_time_data):
+	return (time_data / (np.max(train_time_data, axis = 0) + 1e-8))
+
 def run_simulation(stats, schedule_data):
     e, r = stats.runSimulation(schedule_data)
     score = Coeff_Energy * e + Coeff_Latency * r
     return score
 
+def get_classes(embeddings, model):
+	class_list = []
+	for e in embeddings:
+		if (e == 0).all().item():
+			class_list.append(-1); continue
+		distances = np.array([(torch.mean((e - p)**2)).item() for p in model.prototype])
+		class_list.append(np.argmin(distances))
+	return class_list
+
 def freeze(model):
-    for name, p in model.named_parameters():
-        p.requires_grad = False
+	for name, p in model.named_parameters():
+		p.requires_grad = False
 
 def unfreeze(model):
-    for name, p in model.named_parameters():
-        p.requires_grad = True
+	for name, p in model.named_parameters():
+		p.requires_grad = True
 
 class color:
-    HEADER = '\033[95m'
-    BLUE = '\033[94m'
-    GREEN = '\033[92m'
-    RED = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+	HEADER = '\033[95m'
+	BLUE = '\033[94m'
+	GREEN = '\033[92m'
+	RED = '\033[93m'
+	FAIL = '\033[91m'
+	ENDC = '\033[0m'
+	BOLD = '\033[1m'
+	UNDERLINE = '\033[4m'

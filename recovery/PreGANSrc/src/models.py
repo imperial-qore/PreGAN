@@ -11,7 +11,7 @@ class Attention_50(nn.Module):
 		self.lr = 0.0008
 		self.n_hosts = 50
 		self.n_feats = 3 * self.n_hosts
-		self.n_window = 5 # w_size = 5
+		self.n_window = 3 # w_size = 5
 		self.n_latent = 10
 		self.n_hidden = 16
 		self.n = self.n_window * self.n_feats + self.n_hosts * self.n_hosts
@@ -70,7 +70,7 @@ class Gen_50(nn.Module):
 		)
 
 	def forward(self, e, s):
-		del_s = self.delta(torch.cat((e.view(-1), s.view(-1))))
+		del_s = 4 * self.delta(torch.cat((e.view(-1), s.view(-1))))
 		return s + del_s.reshape(self.n_hosts, self.n_hosts)
 
 # Discriminator Network : Input = Schedule, New Schedule; Output = Likelihood scores
