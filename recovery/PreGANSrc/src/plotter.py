@@ -112,20 +112,20 @@ class Model_Plotter():
 		plt.close()
 
 class GAN_Plotter():
-	def __init__(self, env, gname, dname):
+	def __init__(self, env, gname, dname, training = True):
 		self.env = env
 		self.gname, self.dname = gname, dname
 		self.folder = os.path.join(plot_folder, env, 'gan')
 		self.prefix = self.folder + '/' + self.gname + '_' + self.dname
 		self.epoch = 0
 		os.makedirs(self.folder, exist_ok=True)
-		for f in glob.glob(self.folder + '/*'): os.remove(f)
+		if training:
+			for f in glob.glob(self.folder + '/*'): os.remove(f)
 		self.init_params()
 
 	def init_params(self):
 		self.anomaly_detected = []
 		self.class_detected = []
-		self.new_better = []
 		self.hosts_migrated = []
 		self.migrating = []
 		self.new_score_better = []
@@ -138,7 +138,7 @@ class GAN_Plotter():
 		self.class_detected.append(detected)
 
 	def new_better(self, new_better):
-		self.new_better.append(new_better + 0)
+		self.new_score_better.append(new_better + 0)
 		if not new_better: 
 			self.hosts_migrated.append([0] * int(self.gname.split('_')[1]))
 			self.migrating.append(0)
@@ -148,6 +148,7 @@ class GAN_Plotter():
 		self.hosts_migrated.append(hosts_from)
 		self.prefix2 = self.prefix + '_Test_' + str(self.epoch) + '_'
 		self.epoch += 1
+		self.plot1('New Score Better', self.new_score_better)
 		self.plot_heatmap('Anomaly Scores', 'Detection', 'Class', np.array(self.anomaly_detected).reshape(1, -1), np.array(self.class_detected))
 		self.plot_heatmapc('Migrations', 'AnyMigrated', 'Hosts_from', np.array(self.migrating), np.array(self.hosts_migrated))
 

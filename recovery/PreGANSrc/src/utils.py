@@ -71,7 +71,7 @@ def load_model(folder, fname, modelname):
 
 def load_gan(folder, gfname, dfname, gmodelname, dmodelname):
 	gmodel, gopt, epoch, accuracy_list = load_model(folder, gfname, gmodelname)
-	dmodel, dopt, _, _ = load_model(folder, gfname, dmodelname)
+	dmodel, dopt, _, _ = load_model(folder, dfname, dmodelname)
 	return gmodel, dmodel, gopt, dopt, epoch, accuracy_list
 
 def save_gan(folder, gfname, dfname, gmodel, dmodel, gopt, dopt, epoch, accuracy_list):

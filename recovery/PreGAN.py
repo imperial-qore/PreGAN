@@ -30,10 +30,10 @@ class PreGANRecovery(Recovery):
         # Load generator and discriminator
         self.gen, self.disc, self.gopt, self.dopt, self.epoch, self.accuracy_list = \
             load_gan(model_folder, f'{self.env_name}_{self.gen_name}.ckpt', f'{self.env_name}_{self.disc_name}.ckpt', self.gen_name, self.disc_name) 
+        self.gan_plotter = GAN_Plotter(self.env_name, self.gen_name, self.disc_name, self.training)
         # Freeze GAN if not training
         if not self.training: freeze(self.gen); freeze(self.disc)
-        if self.training: 
-            self.ganloss = nn.BCELoss(); self.gan_plotter = GAN_Plotter(self.env_name, self.gen_name, self.disc_name)
+        if self.training:  self.ganloss = nn.BCELoss()
         self.train_time_data = load_npyfile(os.path.join(data_folder, self.env_name), data_filename)
 
     def train_model(self):
@@ -67,10 +67,10 @@ class PreGANRecovery(Recovery):
         self.epoch += 1; self.accuracy_list.append((gen_loss.item(), disc_loss.item()))
         print(f'{color.HEADER}Epoch {self.epoch},\tGLoss = {gen_loss.item()},\tDLoss = {disc_loss.item()}{color.ENDC}')
         self.gan_plotter.plot(self.accuracy_list, self.epoch, new_score, orig_score)
-        # save_gan(model_folder, f'{self.env_name}_{self.gen_name}.ckpt', f'{self.env_name}_{self.disc_name}.ckpt', \
-        #         self.gen, self.disc, self.gopt, self.dopt, self.epoch, self.accuracy_list)
+        save_gan(model_folder, f'{self.env_name}_{self.gen_name}.ckpt', f'{self.env_name}_{self.disc_name}.ckpt', \
+                self.gen, self.disc, self.gopt, self.dopt, self.epoch, self.accuracy_list)
 
-    def recover_decision(self, embedding, original_decision):
+    def recover_decision(self, embedding, schedule_data, original_decision):
         new_schedule_data = self.gen(embedding, schedule_data)
         probs = self.disc(schedule_data, new_schedule_data)
         self.gan_plotter.new_better(probs[1] >= probs[0])
@@ -85,6 +85,7 @@ class PreGANRecovery(Recovery):
                 container_alloc[c.id] = c.getHostID()
         decision_dict = dict(original_decision); hosts_from = [0] * self.hosts
         for cid in np.concatenate(host_alloc):
+            print(cid); print(schedule_data[cid]);
             one_hot = schedule_data[cid].tolist()
             new_host = one_hot.index(max(one_hot))
             if container_alloc[cid] != new_host: 

@@ -108,7 +108,7 @@ def initalizeEnvironment(environment, logger):
 	
 	# Initialize recovery
 	''' Can be PreNetRecovery '''
-	recovery = PreGANRecovery(HOSTS, environment, training = True)
+	recovery = PreGANRecovery(HOSTS, environment, training = False)
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
