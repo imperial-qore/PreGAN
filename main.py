@@ -51,6 +51,7 @@ from scheduler.HSOGOBI2 import HSOGOBI2Scheduler
 
 # Recovery imports
 from recovery.PreGAN import PreGANRecovery
+from recovery.PCFT import PCFTRecovery
 
 # Auxiliary imports
 from stats.Stats import *
@@ -107,8 +108,8 @@ def initalizeEnvironment(environment, logger):
 	scheduler = GOBIScheduler('energy_latency_'+str(HOSTS)) # GOBIScheduler('energy_latency_'+str(HOSTS))
 	
 	# Initialize recovery
-	''' Can be PreNetRecovery '''
-	recovery = PreGANRecovery(HOSTS, environment, training = False)
+	''' Can be PreNetRecovery, PCFTRecovery '''
+	recovery = PCFTRecovery(HOSTS, environment, training = False)
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
@@ -143,8 +144,8 @@ def stepSimulation(workload, scheduler, recovery, env, stats):
 	selected = scheduler.selection() # Select container IDs for migration
 	decision = scheduler.filter_placement(scheduler.placement(selected+deployed)) # Decide placement for selected container ids
 	schedulingTime = time() - start
-	recovered_decision = recovery.run_model(stats.time_series, decision)
-	migrations = env.simulationStep(decision) # Schedule containers
+	recovered_decision = recovery.run_model(stats.time_series, decision); print(recovered_decision)
+	migrations = env.simulationStep(recovered_decision) # Schedule containers
 	workload.updateDeployedContainers(env.getCreationIDs(migrations, deployed)) # Update workload deployed using creation IDs
 	print("Deployed containers' creation IDs:", env.getCreationIDs(migrations, deployed))
 	print("Deployed:", len(env.getCreationIDs(migrations, deployed)), "of", len(newcontainerinfos), [i[0] for i in newcontainerinfos])
