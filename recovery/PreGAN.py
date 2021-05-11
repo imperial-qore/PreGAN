@@ -85,7 +85,7 @@ class PreGANRecovery(Recovery):
                 container_alloc[c.id] = c.getHostID()
         decision_dict = dict(original_decision); hosts_from = [0] * self.hosts
         for cid in np.concatenate(host_alloc):
-            print(cid); print(schedule_data[cid]);
+            cid = int(cid)
             one_hot = schedule_data[cid].tolist()
             new_host = one_hot.index(max(one_hot))
             if container_alloc[cid] != new_host: 

@@ -115,12 +115,11 @@ class GAN_Plotter():
 	def __init__(self, env, gname, dname, training = True):
 		self.env = env
 		self.gname, self.dname = gname, dname
-		self.folder = os.path.join(plot_folder, env, 'gan')
+		self.folder = os.path.join(plot_folder, env, 'gan' if training else 'test')
 		self.prefix = self.folder + '/' + self.gname + '_' + self.dname
 		self.epoch = 0
 		os.makedirs(self.folder, exist_ok=True)
-		if training:
-			for f in glob.glob(self.folder + '/*'): os.remove(f)
+		for f in glob.glob(self.folder + '/*'): os.remove(f)
 		self.init_params()
 
 	def init_params(self):
@@ -150,7 +149,7 @@ class GAN_Plotter():
 		self.epoch += 1
 		self.plot1('New Score Better', self.new_score_better)
 		self.plot_heatmap('Anomaly Scores', 'Detection', 'Class', np.array(self.anomaly_detected).reshape(1, -1), np.array(self.class_detected))
-		self.plot_heatmapc('Migrations', 'AnyMigrated', 'Hosts_from', np.array(self.migrating), np.array(self.hosts_migrated))
+		self.plot_heatmapc('Migrations', 'AnyMigrated', 'Hosts_from', np.array(self.migrating).reshape(1, -1), np.array(self.hosts_migrated))
 
 	def plot(self, accuracy_list, epoch, ns, os):
 		self.prefix2 = self.prefix + '_' + str(self.epoch) + '_'
@@ -206,9 +205,10 @@ class GAN_Plotter():
 		ax1.set_ylabel(name1)
 		ax1.set_xlabel('Timestamp')
 		yticks = np.linspace(0, 50, 10, dtype=np.int)
-		h1 = sns.heatmap(data1,cmap="YlGnBu", yticklabels=yticks, linewidth=0.01, ax = ax1)
+		data2 = data2.transpose()
+		h1 = sns.heatmap(data1,cmap="YlGnBu", yticklabels=[0], linewidth=0.01, ax = ax1)
 		h2 = sns.heatmap(data2,cmap="YlGnBu", yticklabels=yticks, linewidth=0.01, ax = ax2)
-		ax1.set_yticks(yticks); ax2.set_yticks(yticks)
+		ax1.set_yticks([0]); ax2.set_yticks(yticks)
 		ax2.set_xlabel('Timestamp')
 		ax2.set_ylabel(name2)
 		fig.savefig(self.prefix2 + f'{title}_{name1}_{name2}.pdf')
