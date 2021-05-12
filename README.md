@@ -10,6 +10,8 @@
 # PreNet
 
 Preemptive Migration Prediction Network for Proactive Fault Tolerance in Fog Environments.
+Anomaly classification into: CPU overutilization (CPU), Abnormal disk utilization (ADU), Memory leak (MEL), Abnormal memory allocation (AMA), Network overload (NOL). Ground truth labels obtained by [ADE engine](https://www.openmainframeproject.org/projects/anomaly-detection-engine-for-linux-logs-ade).
+
 
 ## License
 
