@@ -7,10 +7,11 @@
 ![Docker pulls pocketsphinx](https://img.shields.io/docker/pulls/shreshthtuli/pocketsphinx?label=docker%20pulls%3A%20pocketsphinx)
 ![Docker pulls aeneas](https://img.shields.io/docker/pulls/shreshthtuli/aeneas?label=docker%20pulls%3A%20aeneas)
 
-# PreNet
+# PreGAN
 
-Preemptive Migration Prediction Network for Proactive Fault Tolerance in Fog Environments.
-Anomaly classification into: CPU overutilization (CPU), Abnormal disk utilization (ADU), Memory leak (MEL), Abnormal memory allocation (AMA), Network overload (NOL). Ground truth labels obtained by [ADE engine](https://www.openmainframeproject.org/projects/anomaly-detection-engine-for-linux-logs-ade).
+GAN based Preemptive Migration Prediction Network for Proactive Fault Tolerance in Fog Environments. This work uses GANs and co-simulations to learn a few-shot anomaly classifier and preemptive migration (load balancing) based fault-tolerance engine for reliable fog computing.
+
+Anomaly classification into: CPU overutilization (CPU), Abnormal disk utilization (ADU), Memory leak (MEL), Abnormal memory allocation (AMA), Network overload (NOL). Ground truth labels obtained by [ADE tool](https://www.openmainframeproject.org/projects/anomaly-detection-engine-for-linux-logs-ade).
 
 
 ## License
