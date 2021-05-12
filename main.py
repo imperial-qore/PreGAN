@@ -52,6 +52,8 @@ from scheduler.HSOGOBI2 import HSOGOBI2Scheduler
 # Recovery imports
 from recovery.PreGAN import PreGANRecovery
 from recovery.PCFT import PCFTRecovery
+from recovery.DFTM import DFTMRecovery
+from recovery.ECLB import ECLBRecovery
 
 # Auxiliary imports
 from stats.Stats import *
@@ -108,8 +110,8 @@ def initalizeEnvironment(environment, logger):
 	scheduler = GOBIScheduler('energy_latency_'+str(HOSTS)) # GOBIScheduler('energy_latency_'+str(HOSTS))
 	
 	# Initialize recovery
-	''' Can be PreNetRecovery, PCFTRecovery '''
-	recovery = PCFTRecovery(HOSTS, environment, training = False)
+	''' Can be PreNetRecovery, PCFTRecovery, DFTMRecovery, ECLBRecovery '''
+	recovery = ECLBRecovery(HOSTS, environment, training = False)
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
