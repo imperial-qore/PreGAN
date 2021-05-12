@@ -9,26 +9,7 @@
 
 # PreNet
 
-COSCO is an AI based coupled-simulation and container orchestration framework for integrated Edge, Fog and Cloud Computing Environments.  It's a simple python based software solution, where academics or industrialists  can develop, simulate, test and deploy their scheduling policies. 
-
-<img src="https://github.com/imperial-qore/COSCO/blob/master/wiki/COSCO.jpg" width="900" align="middle">
-
-
-## Advantages of COSCO
-1. Hassle free development of AI based scheduling algorithms in integrated edge, fog and cloud infrastructures.
-2. Provides seamless integration of scheduling policies with simulated back-end for enhanced decision making.
-3. Supports container migration physical deployments (not supported by other frameworks) using CRIU utility.
-4. Multiple deployment support as per needs of the developers. (Vagrant VM testbed, VLAN Fog environment, Cloud based deployment using Azure/AWS/OpenStack)
-5. Equipped with a smart real-time graph generation of utilization metrics using InfluxDB and Grafana.
-6. Real time metrics monitoring, logging and consolidated graph generation using custom Stats logger.
-
-The basic architecture of COSCO has two main packages: <br>
-**Simulator:** It's a discrete event simulator and runs in a standalone system. <br>
-**Framework:** It’s a kind of tool to test the scheduling algorithms in a physical(real time) fog/cloud environment with real world applications.
-
-## Wiki
-Access the [wiki](https://github.com/imperial-qore/COSCO/wiki) for installation instructions and replication of results.
-
+Preemptive Migration Prediction Network for Proactive Fault Tolerance in Fog Environments.
 
 ## License
 
