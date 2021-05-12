@@ -54,6 +54,7 @@ from recovery.PreGAN import PreGANRecovery
 from recovery.PCFT import PCFTRecovery
 from recovery.DFTM import DFTMRecovery
 from recovery.ECLB import ECLBRecovery
+from recovery.CMODLB import CMODLBRecovery
 
 # Auxiliary imports
 from stats.Stats import *
@@ -111,7 +112,7 @@ def initalizeEnvironment(environment, logger):
 	
 	# Initialize recovery
 	''' Can be PreNetRecovery, PCFTRecovery, DFTMRecovery, ECLBRecovery '''
-	recovery = ECLBRecovery(HOSTS, environment, training = False)
+	recovery = CMODLBRecovery(HOSTS, environment, training = False)
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
