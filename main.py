@@ -72,7 +72,7 @@ opts, args = parser.parse_args()
 
 # Global constants
 NUM_SIM_STEPS = 400
-HOSTS = 10 * 5 if opts.env == '' else 10
+HOSTS = 10 * 5 if opts.env == '' else 2
 CONTAINERS = HOSTS
 TOTAL_POWER = 1000
 ROUTER_BW = 10000
@@ -108,11 +108,11 @@ def initalizeEnvironment(environment, logger):
 	
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI (arg = 'energy_latency_'+str(HOSTS)) '''
-	scheduler = GOBIScheduler('energy_latency_'+str(HOSTS)) # GOBIScheduler('energy_latency_'+str(HOSTS))
+	scheduler = RandomScheduler() # GOBIScheduler('energy_latency_'+str(HOSTS))
 	
 	# Initialize recovery
 	''' Can be PreNetRecovery, PCFTRecovery, DFTMRecovery, ECLBRecovery '''
-	recovery = CMODLBRecovery(HOSTS, environment, training = False)
+	recovery = None # CMODLBRecovery(HOSTS, environment, training = False)
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
@@ -147,7 +147,7 @@ def stepSimulation(workload, scheduler, recovery, env, stats):
 	selected = scheduler.selection() # Select container IDs for migration
 	decision = scheduler.filter_placement(scheduler.placement(selected+deployed)) # Decide placement for selected container ids
 	schedulingTime = time() - start
-	recovered_decision = recovery.run_model(stats.time_series, decision); print(recovered_decision)
+	recovered_decision = decision # recovery.run_model(stats.time_series, decision)
 	migrations = env.simulationStep(recovered_decision) # Schedule containers
 	workload.updateDeployedContainers(env.getCreationIDs(migrations, deployed)) # Update workload deployed using creation IDs
 	print("Deployed containers' creation IDs:", env.getCreationIDs(migrations, deployed))

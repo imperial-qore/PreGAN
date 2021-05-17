@@ -1,0 +1,1 @@
+ssh-copy-id -i /mnt/c/Users/SHRESHTH/.ssh/id_rsa.pub  pi@192.168.144.252
