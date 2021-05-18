@@ -43,9 +43,9 @@ class Stats():
 		hostinfo['diskavailable'] = [host.getDiskAvailable() for host in self.env.hostlist]
 		cpulist, ramlist, disklist = hostinfo['cpu'], [i[0] for i in hostinfo['ram']], [i[0] for i in hostinfo['disk']]
 		datapoint = np.concatenate([[cpulist[i], ramlist[i], disklist[i]] for i in range(len(cpulist))]).reshape(1, -1)
-		self.time_series = np.append(self.time_series, datapoint, axis=0)
-		datapoint = np.array([self.env.scheduler.result_cache])
-		self.schedule_series = np.append(self.schedule_series, datapoint, axis=0)
+		# self.time_series = np.append(self.time_series, datapoint, axis=0)
+		# datapoint = np.array([self.env.scheduler.result_cache])
+		# self.schedule_series = np.append(self.schedule_series, datapoint, axis=0)
 		self.hostinfo.append(hostinfo)
 
 	def saveWorkloadInfo(self, deployed, migrations):
@@ -106,7 +106,7 @@ class Stats():
 		metrics['slaviolations'] = len(np.where([c.destroyAt > c.sla for c in destroyed]))
 		metrics['slaviolationspercentage'] = metrics['slaviolations'] * 100.0 / len(destroyed) if len(destroyed) > 0 else 0
 		metrics['waittime'] = [c.startAt - c.createAt for c in destroyed]
-		metrics['energytotalinterval_pred'], metrics['avgresponsetime_pred'] = self.runSimulationGOBI()
+		# metrics['energytotalinterval_pred'], metrics['avgresponsetime_pred'] = self.runSimulationGOBI()
 		self.metrics.append(metrics)
 
 	def saveSchedulerInfo(self, selectedcontainers, decision, schedulingtime):
@@ -301,12 +301,13 @@ class Stats():
 		# self.generateGraphsWithInterval(dirname, self.activecontainerinfo, 'container', 'hostalloc')
 		# self.generateMetricsWithInterval(dirname)
 		# self.generateWorkloadWithInterval(dirname)
-		self.generateTimeSeriesDataset(dirname)
+		# self.generateTimeSeriesDataset(dirname)
+		pass
 
 	def generateDatasets(self, dirname):
 		# self.generateDatasetWithInterval(dirname, 'cpu', objfunc='energytotalinterval')
 		self.generateDatasetWithInterval(dirname, 'cpu', metric2='apparentips', objfunc='energytotalinterval', objfunc2='avgresponsetime')
-		self.generateDatasetWithInterval2(dirname, 'cpu', 'apparentips', 'energytotalinterval_pred', 'avgresponsetime_pred', objfunc='energytotalinterval', objfunc2='avgresponsetime')
+		# self.generateDatasetWithInterval2(dirname, 'cpu', 'apparentips', 'energytotalinterval_pred', 'avgresponsetime_pred', objfunc='energytotalinterval', objfunc2='avgresponsetime')
 		
 	def generateCompleteDatasets(self, dirname):
 		self.generateCompleteDataset(dirname, self.hostinfo, 'hostinfo')
