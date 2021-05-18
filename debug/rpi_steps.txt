@@ -1,0 +1,13 @@
+flash ubuntu server image
+add ssh file in boot
+configure wifi to local hotspot
+
+ssh to ubuntu@ip
+change password to raspberry
+change hostname to worker1, worker2, ...
+add static ip 192.168.1.11, 192.168.1.12, ...
+ 
+configure passwordless ssh
+
+downgrade kernel
+install packages and criu
