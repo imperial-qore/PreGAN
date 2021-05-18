@@ -11,6 +11,6 @@ class Recovery():
         self.env = env
         self.env_name = env.__class__.__name__.lower()
 
-    def run_model(self, time_series):
-        pass
+    def run_model(self, time_series, original_decision):
+        return original_decision
 

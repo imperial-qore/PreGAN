@@ -51,6 +51,7 @@ from scheduler.HSOGOBI import HSOGOBIScheduler
 from scheduler.HSOGOBI2 import HSOGOBI2Scheduler
 
 # Recovery imports
+from recovery.Recovery import Recovery
 from recovery.PreGAN import PreGANRecovery
 from recovery.PCFT import PCFTRecovery
 from recovery.DFTM import DFTMRecovery
@@ -113,7 +114,7 @@ def initalizeEnvironment(environment, logger):
 	
 	# Initialize recovery
 	''' Can be PreNetRecovery, PCFTRecovery, DFTMRecovery, ECLBRecovery '''
-	recovery = None # CMODLBRecovery(HOSTS, environment, training = False)
+	recovery = Recovery() # CMODLBRecovery(HOSTS, environment, training = False)
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
@@ -148,7 +149,7 @@ def stepSimulation(workload, scheduler, recovery, env, stats):
 	selected = scheduler.selection() # Select container IDs for migration
 	decision = scheduler.filter_placement(scheduler.placement(selected+deployed)) # Decide placement for selected container ids
 	schedulingTime = time() - start
-	recovered_decision = decision # recovery.run_model(stats.time_series, decision)
+	recovered_decision = recovery.run_model(stats.time_series, decision)
 	migrations = env.simulationStep(recovered_decision) # Schedule containers
 	workload.updateDeployedContainers(env.getCreationIDs(migrations, deployed)) # Update workload deployed using creation IDs
 	print("Deployed containers' creation IDs:", env.getCreationIDs(migrations, deployed))
