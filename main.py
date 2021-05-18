@@ -21,6 +21,7 @@ from framework.workload.DeFogWorkload import *
 # Simulator imports
 from simulator.Simulator import *
 from simulator.environment.AzureFog import *
+from simulator.environment.RPiEdge import *
 from simulator.environment.BitbrainFog import *
 from simulator.workload.BitbrainWorkload_GaussianDistribution import *
 from simulator.workload.BitbrainWorkload2 import *
@@ -72,7 +73,7 @@ opts, args = parser.parse_args()
 
 # Global constants
 NUM_SIM_STEPS = 400
-HOSTS = 10 * 5 if opts.env == '' else 2
+HOSTS = 16 if opts.env == '' else 16
 CONTAINERS = HOSTS
 TOTAL_POWER = 1000
 ROUTER_BW = 10000
@@ -97,7 +98,7 @@ def initalizeEnvironment(environment, logger):
 	if environment != '':
 		datacenter = Datacenter(HOSTS_IP, environment, 'Virtual')
 	else:
-		datacenter = AzureFog(HOSTS)
+		datacenter = RPiEdge(HOSTS)
 
 	# Initialize workload
 	''' Can be SWSD, BWGD, BWGD2 // DFW '''

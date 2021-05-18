@@ -7,6 +7,8 @@ import logging
 import os
 import platform
 from metrics.powermodels.PMRaspberryPi import *
+from metrics.powermodels.PMRaspberryPi4B import *
+from metrics.powermodels.PMRaspberryPi4B8G import *
 from metrics.powermodels.PMB2s import *
 from metrics.powermodels.PMB4ms import *
 from metrics.powermodels.PMB8ms import *
