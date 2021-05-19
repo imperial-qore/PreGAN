@@ -110,7 +110,7 @@ def initalizeEnvironment(environment, logger):
 	
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI (arg = 'energy_latency_'+str(HOSTS)) '''
-	scheduler = RandomScheduler() # GOBIScheduler('energy_latency_'+str(HOSTS))
+	scheduler = GOBIScheduler('energy_latency_'+str(HOSTS))
 	
 	# Initialize recovery
 	''' Can be PreNetRecovery, PCFTRecovery, DFTMRecovery, ECLBRecovery '''
@@ -231,7 +231,7 @@ if __name__ == '__main__':
 	datacenter, workload, scheduler, recovery, env, stats = initalizeEnvironment(env, logger)
 
 	for step in range(NUM_SIM_STEPS):
-		print(color.BOLD+"Simulation Interval:", step, color.ENDC)
+		print(color.BOLD+("Simulation" if opts.env == '' else "Execution")+" Interval:", step, color.ENDC)
 		stepSimulation(workload, scheduler, recovery, env, stats)
 		if env != '' and step % 10 == 0: saveStats(stats, datacenter, workload, env, end = False)
 
