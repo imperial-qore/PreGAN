@@ -22,6 +22,7 @@ class Model_Plotter():
 	def __init__(self, env, modelname):
 		self.env = env
 		self.model_name = modelname
+		self.n_hosts = int(modelname.split('_')[-1])
 		self.folder = os.path.join(plot_folder, env, 'model')
 		self.prefix = self.folder + '/' + self.model_name
 		self.epoch = 0
@@ -92,7 +93,7 @@ class Model_Plotter():
 		ax1.set_title(title)
 		ax1.set_ylabel(name1)
 		ax1.set_xlabel('Timestamp')
-		yticks = np.linspace(0, 50, 10, dtype=np.int)
+		yticks = np.linspace(0, self.n_hosts, 10, dtype=np.int)
 		h1 = sns.heatmap(data1.transpose(),cmap="YlGnBu", yticklabels=yticks, linewidth=0.01, ax = ax1)
 		h2 = sns.heatmap(data2.transpose(),cmap="YlGnBu", yticklabels=yticks, linewidth=0.01, ax = ax2)
 		ax1.set_yticks(yticks); ax2.set_yticks(yticks)
@@ -115,6 +116,7 @@ class GAN_Plotter():
 	def __init__(self, env, gname, dname, training = True):
 		self.env = env
 		self.gname, self.dname = gname, dname
+		self.n_hosts = int(gname.split('_')[-1])
 		self.folder = os.path.join(plot_folder, env, 'gan' if training else 'test')
 		self.prefix = self.folder + '/' + self.gname + '_' + self.dname
 		self.epoch = 0
@@ -187,7 +189,7 @@ class GAN_Plotter():
 		ax1.set_title(title)
 		ax1.set_ylabel(name1)
 		ax1.set_xlabel('Timestamp')
-		yticks = np.linspace(0, 50, 10, dtype=np.int)
+		yticks = np.linspace(0, self.n_hosts, 10, dtype=np.int)
 		h1 = sns.heatmap(data1,cmap="YlGnBu", yticklabels=[0], linewidth=0.01, ax = ax1)
 		dcmap = LinearSegmentedColormap.from_list('Custom', ['w', 'r', 'g', 'b'], 4)
 		data2 = (data2 + 1).transpose()
@@ -204,7 +206,7 @@ class GAN_Plotter():
 		ax1.set_title(title)
 		ax1.set_ylabel(name1)
 		ax1.set_xlabel('Timestamp')
-		yticks = np.linspace(0, 50, 10, dtype=np.int)
+		yticks = np.linspace(0, self.n_hosts, 10, dtype=np.int)
 		data2 = data2.transpose()
 		h1 = sns.heatmap(data1,cmap="YlGnBu", yticklabels=[0], linewidth=0.01, ax = ax1)
 		h2 = sns.heatmap(data2,cmap="YlGnBu", yticklabels=yticks, linewidth=0.01, ax = ax2)
