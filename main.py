@@ -73,7 +73,7 @@ parser.add_option("-m", "--mode", action="store", dest="mode", default="0",
 opts, args = parser.parse_args()
 
 # Global constants
-NUM_SIM_STEPS = 200
+NUM_SIM_STEPS = 400
 HOSTS = 16 if opts.env == '' else 16
 CONTAINERS = HOSTS
 TOTAL_POWER = 1000
