@@ -60,7 +60,7 @@ def load_model(folder, fname, modelname):
 		model.load_state_dict(checkpoint['model_state_dict'])
 		model.prototype = checkpoint['model_prototypes']
 		for p in model.prototype: p.requires_grad = False
-		if 'Att' in model.name: print(model.prototype)
+		# if 'Att' in model.name: print(model.prototype)
 		optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 		epoch = checkpoint['epoch']
 		accuracy_list = checkpoint['accuracy_list']

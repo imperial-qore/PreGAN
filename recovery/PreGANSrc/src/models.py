@@ -8,16 +8,13 @@ class Attention_16(nn.Module):
 	def __init__(self):
 		super(Attention_16, self).__init__()
 		self.name = 'Attention_16'
-		self.lr = 0.001
+		self.lr = 0.0008
 		self.n_hosts = 16
 		self.n_feats = 3 * self.n_hosts
 		self.n_window = 3 # w_size = 5
 		self.n_latent = 10
 		self.n_hidden = 16
 		self.n = self.n_window * self.n_feats + self.n_hosts * self.n_hosts
-		# self.atts = [ nn.Sequential( nn.Linear(self.n, self.n_feats * self.n_feats), 
-		# 		nn.Sigmoid())	for i in range(1)]
-		# self.encoder_atts = nn.ModuleList(self.atts)
 		self.encoder = nn.Sequential(
 			nn.Linear(self.n_window * self.n_feats, self.n_hosts * self.n_latent), nn.LeakyReLU(True),
 		)
@@ -30,10 +27,6 @@ class Attention_16(nn.Module):
 		self.prototype = [torch.rand(PROTO_DIM, requires_grad=False, dtype=torch.double) for _ in range(3)]
 
 	def encode(self, t, s):
-		# for at in self.encoder_atts:
-		# 	inp = torch.cat((t.view(-1), s.view(-1)))
-		# 	ats = at(inp).reshape(self.n_feats, self.n_feats)
-		# 	t = torch.matmul(t, ats)	
 		t = self.encoder(t.view(-1)).view(self.n_hosts, self.n_latent)	
 		return t
 
