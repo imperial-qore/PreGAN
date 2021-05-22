@@ -4,12 +4,12 @@ import torch.nn.functional as F
 from .constants import *
 
 ## Simple FCN Model
-class FCN_50(nn.Module):
+class FCN_16(nn.Module):
 	def __init__(self):
-		super(FCN_50, self).__init__()
-		self.name = 'FCN_50'
+		super(FCN_16, self).__init__()
+		self.name = 'FCN_16'
 		self.lr = 0.001
-		self.n_hosts = 50
+		self.n_hosts = 16
 		self.n_feats = 3 * self.n_hosts
 		self.n_window = 1 
 		self.n_hidden = 32

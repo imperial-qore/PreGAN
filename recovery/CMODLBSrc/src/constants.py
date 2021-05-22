@@ -4,4 +4,4 @@ data_folder = 'recovery/PreGANSrc/data/'
 data_filename = 'time_series.npy'
 
 # Hyperparameters
-num_epochs = 10
+num_epochs = 30
