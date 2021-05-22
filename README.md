@@ -104,6 +104,7 @@ Explot the trade-off between no migration (contention) and migration (transfer o
 
 - Visualization of migration decisions (Plot) :
 	- Migration from hosts.
+	- Accuracy (correct prediction / total anomalies), better schedule (migrations / migrations+no-migrations)
 
 - Loss and accuracy curves with intervals/epochs for ADPE and GAN (Plot):
 	- ADPE loss (CE and Triplet), detection and classification accuracy
