@@ -113,8 +113,8 @@ def initalizeEnvironment(environment, logger):
 	scheduler = GOBIScheduler('energy_latency_'+str(HOSTS))
 	
 	# Initialize recovery
-	''' Can be PreNetRecovery, PCFTRecovery, DFTMRecovery, ECLBRecovery '''
-	recovery = ECLBRecovery(HOSTS, environment, training = False)
+	''' Can be PreNetRecovery, PCFTRecovery, DFTMRecovery, ECLBRecovery, CMODLBRecovery '''
+	recovery = CMODLBRecovery(HOSTS, environment, training = False)
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
