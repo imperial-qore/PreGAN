@@ -114,7 +114,7 @@ def initalizeEnvironment(environment, logger):
 	
 	# Initialize recovery
 	''' Can be PreNetRecovery, PCFTRecovery, DFTMRecovery, ECLBRecovery, CMODLBRecovery '''
-	recovery = CMODLBRecovery(HOSTS, environment, training = False)
+	recovery = Recovery()
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
