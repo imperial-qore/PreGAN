@@ -27,17 +27,8 @@ plt.rcParams["text.usetex"] = True
 size = (2.9, 2.5)
 env = argv[1]
 option = 0
-sla_baseline = 'A3C'
+sla_baseline = 'GOBI'
 rot = 25
-if len(argv) >= 3:
-	rot = 15
-	if 'HSO' in argv[2]:
-		option = 1
-		sla_baseline = 'GOBI*'
-	elif 'A' in argv[2]: 
-		option = 2
-		sla_baseline = 'GOBI*'
-
 
 def fairness(l):
 	a = 1 / (np.mean(l)-(scipy.stats.hmean(l)+0.001)) # 1 / slowdown i.e. 1 / (am - hm)
@@ -73,14 +64,8 @@ def mean_confidence_interval(data, confidence=0.90):
 PATH = 'all_datasets/' + env + '/'
 SAVE_PATH = 'results/' + env + '/'
 
-Models = ['GOBI*', 'GOBI', 'A3C', 'GA', 'DQLCM', 'POND', 'LR-MMT', 'MAD-MC'] 
-if option == 1:
-	rot = 90
-	Models = ['GOSH*', 'GOSH', 'SGOBI*', 'SGOBI', 'HGOBI*', 'HGOBI', 'GOBI*', 'GOBI', 'HGP', 'A3C', 'POND']
-	# Models = ['GOSH*', 'GOSH', 'GOBI*', 'GOBI', 'HGP', 'A3C', 'POND']
-if option == 2:
-	Models = ['GOSH*', 'GOSH', 'SGOBI*', 'SGOBI', 'HGOBI*', 'HGOBI']
-xLabel = 'Simulation Time (minutes)'
+Models = ['PreGAN', 'CMODLB', 'PCFT', 'ECLB', 'DFTM', 'GOBI'] 
+xLabel = 'Execution Time (minutes)'
 Colors = ['red', 'blue', 'green', 'orange', 'magenta', 'pink', 'cyan', 'maroon', 'grey', 'purple', 'navy']
 apps = ['yolo', 'pocketsphinx', 'aeneas']
 
