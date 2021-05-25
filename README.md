@@ -81,10 +81,9 @@ Explot the trade-off between no migration (contention) and migration (transfer o
 3. Loss multiplier for class imbalance.
 4. Class representation prototypes updated using exponential decay.
 
-* Train Encoder - 100 intervals
+* Train Encoder - 200 intervals
 * Traing GAN - 400 intervals
 * Test - 100 intervals
-
 
 ## Figures and Comparisons
 
@@ -93,45 +92,42 @@ Explot the trade-off between no migration (contention) and migration (transfer o
 	- Generator
 	- Discriminator
 
-- Visualization of attention score (Plot) :
+- @Visualization of attention score (Plot) :
 	- Truncated (say 5 dimension time-series data) with colormap of attention scores for each dimension
 
 - Visualization of predictions with classes (Plot) :
 	- Truncated (say 5 dimension time-series data) with class highlighting
 
-- Visualization of class prototypes (Plot) :
+- @Visualization of class prototypes (Plot) :
 	- tSNE plot of embeddings on test dataset for different class protypes.
 
-- Visualization of migration decisions (Plot) :
+- @Loss and accuracy curves with intervals/epochs for ADPE and GAN (Plot):
+	- Detection and classification accuracy, visualization of predicitons/ground-truth, confusion matrix
+	- GAN loss (gen and disc), which is better
+
+- @Visualization of migration decisions (Plot) :
 	- Migration from hosts.
 	- Accuracy (correct prediction / total anomalies), better schedule (migrations / migrations+no-migrations)
 
-- Loss and accuracy curves with intervals/epochs for ADPE and GAN (Plot):
-	- ADPE loss (CE and Triplet), detection and classification accuracy
-	- GAN loss (gen and disc), which is better
+- @Experimental setup (Image) :
+	- RPi Cluster
 
 - Dataset Statistics (Table) :
 	- Dimension
 	- Size (training and testing)
 	- Anomaly rate
 
-- Detection (Table) :
-	- complete datasets - F1, Precision, Recall
-
-- Diagnosis (Table) :
-	- complete datasets - NDCG@5, HitRate@100%, HitRate@150%
-
-- Classification (Plot) :
-	- accuracy, confusion matrix
+- Comparison (Table) :
+	- detection - Acc, P, R, F1
+	- diagnosis - NDCG@5, HitRate@100%, HitRate@150%
+	- classification error
+	- %found better schedule.
 
 - Ablation (Table) :
 	- Detection, delay and diagnosis performance w/o MAML/self-conditioning/adversarial-training
 
 - Sensitivity Analysis (Plots) : 
 	- detection/diagnosis/classification with window size, prtotype dimension, decay factor.
-
-- Experimental setup (Image) :
-	- RPi Cluster
 
 - QoS (Plots) :
 	- Response time, energy, sla, preemptive migrations, anomalies (each class)
