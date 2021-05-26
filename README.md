@@ -95,7 +95,7 @@ Explot the trade-off between no migration (contention) and migration (transfer o
 - @Visualization of attention score (Plot) :
 	- Truncated (say 5 dimension time-series data) with colormap of attention scores for each dimension
 
-- Visualization of predictions with classes (Plot) :
+- @Visualization of predictions with classes (Plot) :
 	- Truncated (say 5 dimension time-series data) with class highlighting
 
 - @Visualization of class prototypes (Plot) :
@@ -112,7 +112,7 @@ Explot the trade-off between no migration (contention) and migration (transfer o
 - @Experimental setup (Image) :
 	- RPi Cluster
 
-- Dataset Statistics (Table) :
+- @Dataset Statistics (Table) :
 	- Dimension
 	- Size (training and testing)
 	- Anomaly rate

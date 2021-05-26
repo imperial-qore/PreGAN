@@ -60,14 +60,19 @@ def backprop(epoch, model, train_time_data, train_schedule_data, anomaly_data, c
 
 # Accuracy 
 def anomaly_accuracy(source_anomaly, target_anomaly, model_plotter):
-	correct = 0; res_list = []
+	correct = 0; res_list = []; tp, fp, tn, fn = 0, 0, 0, 0
 	for i, sa in enumerate(source_anomaly):
 		res = torch.argmax(sa).item() 
 		res_list.append(res)
 		if res == target_anomaly[i]:
 			correct += 1
+			if target_anomaly[i] == 1: tp += 1
+			else: tn += 1
+		else:
+			if target_anomaly[i] == 1: fn += 1
+			else: fp += 1
 	model_plotter.update_anomaly(res_list, target_anomaly, correct/len(source_anomaly))
-	return correct/len(source_anomaly)
+	return correct/len(source_anomaly), tp, tn, fp, fn
 
 def class_accuracy(source_prototype, target_anomaly, target_class, model, model_plotter):
 	correct, total = 0, 1e-4; prototypes = []
@@ -87,13 +92,19 @@ def class_accuracy(source_prototype, target_anomaly, target_class, model, model_
 	return correct / total
 
 def accuracy(model, train_time_data, train_schedule_data, anomaly_data, class_data, model_plotter):
-	anomaly_correct, class_correct, class_total = 0, 0, 0
+	anomaly_correct, class_correct, class_total = 0, 0, 0; tpl, tnl, fpl, fnl = [], [], [], []
 	for i, d in enumerate(train_time_data):
 		output = model(train_time_data[i], train_schedule_data[i])
 		source_anomaly, source_prototype = output
-		anomaly_correct += anomaly_accuracy(source_anomaly, anomaly_data[i], model_plotter)
+		res, tp, tn, fp, fn = anomaly_accuracy(source_anomaly, anomaly_data[i], model_plotter)
+		anomaly_correct += res
+		tpl.append(tp); tnl.append(tn); fpl.append(fp); fnl.append(fn)
+		tp += res; fp += res; tn += (1 - res); fn += (1 - res)
 		if np.sum(anomaly_data[i]) > 0:
 			class_total += 1
 			class_correct += class_accuracy(source_prototype, anomaly_data[i], class_data[i], model, model_plotter)
+	tp, fp, tn, fn = np.mean(tpl), np.mean(fpl), np.mean(tnl), np.mean(fn)
+	p, r = tp/(tp+fp), tp/(tp+fn)
+	tqdm.write(f'P = {p}, R = {r}, F1 = {2 * p * r / (p + r)}')
 	return anomaly_correct / len(train_time_data), class_correct / class_total
 
