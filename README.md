@@ -85,6 +85,8 @@ Explot the trade-off between no migration (contention) and migration (transfer o
 * Traing GAN - 400 intervals
 * Test - 100 intervals
 
+Algorithms for the three stages.
+
 ## Figures and Comparisons
 
 - @Model diagram (Figure) :
@@ -117,23 +119,20 @@ Explot the trade-off between no migration (contention) and migration (transfer o
 	- Size (training and testing)
 	- Anomaly rate
 
-- Comparison (Table) :
+- @Comparison (Table) :
 	- detection - Acc, P, R, F1
 	- diagnosis - NDCG@5, HitRate@100%, HitRate@150%
 	- classification error
-	- %found better schedule.
+	- %found better schedule = (No of better decisions as per co-simulation / Total anomalies detected after experiment by ADE tool). This means out of say 200 intervals, 40 have true anomalies, 38 were detected, 30 were those where a better schedule was found. So 30 / 40. (Most important metric)
 
-- Ablation (Table) :
-	- Detection, delay and diagnosis performance w/o MAML/self-conditioning/adversarial-training
+- @QoS (Plots) :
+	- Response time, energy, sla, preemptive migrations, anomalies (each class). Overheads.
+
+- @QoS senstivity using simulator (Plot) :
+	- QoS with workloads. (energy, sla, Improvement ratio, f1)
 
 - Sensitivity Analysis (Plots) : 
-	- detection/diagnosis/classification with window size, prtotype dimension, decay factor.
-
-- QoS (Plots) :
-	- Response time, energy, sla, preemptive migrations, anomalies (each class)
-
-- QoS senstivity using simulator (Plot) :
-	- QoS with hosts and workloads
+	- detection/diagnosis/classification with window size, prototype dimension, decay factor.
 
 ## License
 

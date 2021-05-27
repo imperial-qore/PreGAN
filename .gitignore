@@ -142,3 +142,4 @@ recovery/PreGANSrc/checkpoints/simulator_Attention_50.ckpt
 recovery/PreGANSrc/checkpoints/simulator_Disc_50.ckpt
 recovery/PreGANSrc/checkpoints/simulator_Gen_50.ckpt
 *.pdf
+graphernew.py
