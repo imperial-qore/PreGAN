@@ -35,7 +35,7 @@ Anomaly classification into: CPU overutilization (CPU), Abnormal disk utilizatio
 
 ## Motivation
 
-Explot the trade-off between no migration (contention) and migration (transfer overheads).
+Exploit the trade-off between no migration (contention) and migration (transfer overheads).
 
 1. Graph Attention :
 	- multi-modal feature extraction
