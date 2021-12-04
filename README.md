@@ -46,7 +46,7 @@ Change line 117 in `main.py` to use one of the implemented fault-tolerance techn
 python3 main.py
 ````
 ## Cite this work
-Our work is published in NeurIPS 2021, Workshop on ML for Systems.
+Our work is accepted in IEEE Conference on Computer Communications (INFOCOM) 2022.
 ```bibtex
 @inproceedings{tuli2021pregan,
   title={{PreGAN: Preemptive Migration Prediction Network for Proactive Fault-Tolerant Edge Computing}},
