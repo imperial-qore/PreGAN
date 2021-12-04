@@ -30,6 +30,7 @@ Building a fault-tolerant edge system that can quickly react to node overloads o
 Clone repo.
 ```console
 git clone https://github.com/imperial-qore/PreGAN.git
+cd PreGAN/
 ```
 Install dependencies.
 ```console
