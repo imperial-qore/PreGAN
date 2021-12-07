@@ -45,6 +45,11 @@ Change line 117 in `main.py` to use one of the implemented fault-tolerance techn
 ```console
 python3 main.py
 ````
+
+## Arxiv preprint
+
+https://arxiv.org/abs/2112.02292
+
 ## Cite this work
 Our work is accepted in IEEE Conference on Computer Communications (INFOCOM) 2022.
 ```bibtex
