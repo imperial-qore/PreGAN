@@ -46,12 +46,15 @@ Change line 117 in `main.py` to use one of the implemented fault-tolerance techn
 python3 main.py
 ````
 
-## Arxiv preprint
-
-https://arxiv.org/abs/2112.02292
+## External Links
+| Items | Contents | 
+| --- | --- |
+| **Pre-print** | https://arxiv.org/abs/2112.02292 |
+| **Contact**| Shreshth Tuli ([@shreshthtuli](https://github.com/shreshthtuli))  |
+| **Funding**| Imperial President's scholarship |
 
 ## Cite this work
-Our work is accepted in IEEE Conference on Computer Communications (INFOCOM) 2022.
+Our work is accepted in IEEE Conference on Computer Communications (INFOCOM) 2022. Cite our work using the bibtex entry below.
 ```bibtex
 @inproceedings{tuli2021pregan,
   title={{PreGAN: Preemptive Migration Prediction Network for Proactive Fault-Tolerant Edge Computing}},
