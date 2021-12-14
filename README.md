@@ -59,7 +59,7 @@ Our work is accepted in IEEE Conference on Computer Communications (INFOCOM) 202
 @inproceedings{tuli2021pregan,
   title={{PreGAN: Preemptive Migration Prediction Network for Proactive Fault-Tolerant Edge Computing}},
   author={Tuli, Shreshth and Casale, Giuliano and Jennings, Nicholas R},
-  booktitle={IEEE Conference on Computer Communications (INFOCOM) 2022},
+  booktitle={IEEE Conference on Computer Communications (INFOCOM)},
   year={2022},
   organization={IEEE}
 }
