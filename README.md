@@ -50,6 +50,7 @@ python3 main.py
 | Items | Contents | 
 | --- | --- |
 | **Pre-print** | https://arxiv.org/abs/2112.02292 |
+| **Video** | https://youtu.be/Pp82aZu5dJw |
 | **Contact**| Shreshth Tuli ([@shreshthtuli](https://github.com/shreshthtuli))  |
 | **Funding**| Imperial President's scholarship |
 
