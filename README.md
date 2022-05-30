@@ -55,7 +55,7 @@ python3 main.py
 | **Funding**| Imperial President's scholarship |
 
 ## Cite this work
-Our work is accepted in IEEE Conference on Computer Communications (INFOCOM) 2022. Cite our work using the bibtex entry below.
+Our work is accepted in IEEE Conference on Computer Communications (INFOCOM) 2022 and received the "Best Paper Award" at the conference. Cite our work using the bibtex entry below.
 ```bibtex
 @inproceedings{tuli2021pregan,
   title={{PreGAN: Preemptive Migration Prediction Network for Proactive Fault-Tolerant Edge Computing}},
