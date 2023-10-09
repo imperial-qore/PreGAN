@@ -11,7 +11,7 @@ from .PreGANSrc.src.train import *
 class PreGANRecovery(Recovery):
     def __init__(self, hosts, env, training = False):
         super().__init__()
-        self.model_name = f'Attention_{hosts}'
+        self.model_name = f'FPE_{hosts}'
         self.gen_name = f'Gen_{hosts}'
         self.disc_name = f'Disc_{hosts}'
         self.hosts = hosts
@@ -122,6 +122,6 @@ class PreGANRecovery(Recovery):
         # Pass through GAN
         if self.training:
             self.train_gan(embedding, schedule_data)
-            return original_decision
+            # return original_decision
         return self.recover_decision(embedding, schedule_data, original_decision)
 
