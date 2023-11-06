@@ -30,7 +30,7 @@ class Model_Plotter():
 		for f in glob.glob(self.folder + '/*'): os.remove(f)
 		self.tsne = TSNE(n_components=2, perplexity=50, n_iter=1000)
 		self.colors = ['r', 'g', 'b']
-		plt.rcParams["font.family"] = "Maven Pro"
+		# plt.rcParams["font.family"] = "Maven Pro"
 		self.init_params()
 
 	def init_params(self):
@@ -64,7 +64,7 @@ class Model_Plotter():
 		self.target_anomaly_scores = np.array(self.target_anomaly_scores)
 		self.plot_heatmap('Anomaly Scores', 'Prediction', 'Ground Truth', self.source_anomaly_scores, self.target_anomaly_scores)
 		X = [i[0].tolist() for i in self.protoypes]; Y = np.array([i[1] for i in self.protoypes])
-		x2d = self.tsne.fit_transform(X)
+		x2d = self.tsne.fit_transform(np.array(X))
 		self.plot_tsne('Prototypes', x2d, Y)
 		self.init_params()
 
@@ -93,11 +93,11 @@ class Model_Plotter():
 	def plot_heatmap(self, title, name1, name2, data1, data2):
 		fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(3, 1.8))
 		ax1.set_title(title)
-		yticks = np.linspace(0, self.n_hosts, 4, dtype=np.int)
+		yticks = np.linspace(0, self.n_hosts, 4, dtype=np.int32)
 		h1 = sns.heatmap(data1.transpose(),cmap="YlGnBu", yticklabels=yticks, linewidth=0.01, ax = ax1)
 		h2 = sns.heatmap(data2.transpose(),cmap="YlGnBu", yticklabels=yticks, linewidth=0.01, ax = ax2)
 		ax1.set_yticks(yticks); ax2.set_yticks(yticks); 
-		xticks = np.linspace(0, data1.shape[0]-2, 5, dtype=np.int)
+		xticks = np.linspace(0, data1.shape[0]-2, 5, dtype=np.int32)
 		ax1.set_xticks(xticks); ax2.set_xticks(xticks); ax2.set_xticklabels(xticks, rotation=0)
 		ax1.set_xticklabels(xticks, rotation=0)
 		ax2.set_xlabel('Timestamp')
@@ -153,7 +153,7 @@ class GAN_Plotter():
 		self.prefix2 = self.prefix + '_Test_' + str(self.epoch) + '_'
 		self.epoch += 1
 		self.plot1('New Score Better', self.new_score_better)
-		if self.epoch  < 4: return
+		if self.epoch < 20: return
 		self.plot_heatmap('Anomaly Scores', 'Prediction', 'Class', np.array(self.anomaly_detected).reshape(1, -1), np.array(self.class_detected))
 		self.plot_heatmapc('Migrations', 'Migration', 'Hosts from Migration', np.array(self.migrating).reshape(1, -1), np.array(self.hosts_migrated))
 
@@ -166,7 +166,7 @@ class GAN_Plotter():
 		self.plot2('Generator Loss', 'Discriminator Loss', self.gloss_list, self.dloss_list)
 		self.plot3('Generator Loss', 'Discriminator Loss', 'New Schedule Better', self.gloss_list, self.dloss_list, self.new_score_better)
 		self.plot1('New Score Better', self.new_score_better)
-		if epoch < 4: return
+		if epoch < 20: return
 		self.plot_heatmap('Anomaly Scores', 'Prediction', 'Class', np.array(self.anomaly_detected).reshape(1, -1), np.array(self.class_detected))
 
 	def plot1(self, name1, data1, smooth = True, xlabel='Epoch'):
@@ -210,14 +210,14 @@ class GAN_Plotter():
 	def plot_heatmap(self, title, name1, name2, data1, data2):
 		fig, (ax1, ax2) = plt.subplots(2, 1,gridspec_kw={'height_ratios': [0.2, 1]}, figsize=(3,1.5))
 		ax1.set_title(title)
-		yticks = np.linspace(0, self.n_hosts, 2, dtype=np.int)
+		yticks = np.linspace(0, self.n_hosts, 2, dtype=np.int32)
 		h1 = sns.heatmap(data1,cmap="YlGnBu", yticklabels=[0], linewidth=0.01, ax = ax1)
 		dcmap = LinearSegmentedColormap.from_list('Custom', ['w', 'r', 'g', 'b'], 4)
 		data2 = (data2 + 1).transpose()
 		h2 = sns.heatmap(data2,cmap=dcmap, yticklabels=yticks, linewidth=0.01, ax = ax2, vmin=0, vmax=3)
 		ax1.set_yticks([0]); ax2.set_yticks(yticks)
 		ax2.set_yticklabels(yticks, rotation=0)
-		xticks1 = np.linspace(0, data1.shape[1], 5, dtype=np.int); xticks2 = np.linspace(0, data2.shape[1], 5, dtype=np.int)
+		xticks1 = np.linspace(0, data1.shape[1], 5, dtype=np.int32); xticks2 = np.linspace(0, data2.shape[1], 5, dtype=np.int32)
 		ax1.set_xticks(xticks1); ax2.set_xticks(xticks2); ax2.set_xticklabels(xticks2, rotation=0)
 		ax1.set_xticklabels(xticks1, rotation=0)
 		ax2.set_xlabel('Timestamp'); ax1.set_ylabel(name1)
@@ -230,13 +230,13 @@ class GAN_Plotter():
 		fig, (ax1, ax2) = plt.subplots(2, 1,gridspec_kw={'height_ratios': [0.2, 1]}, figsize=(3,1.5))
 		ax1.set_title(title)
 		ax1.set_ylabel(name1)
-		yticks = np.linspace(0, self.n_hosts, 10, dtype=np.int)
+		yticks = np.linspace(0, self.n_hosts, 10, dtype=np.int32)
 		data2 = data2.transpose()
 		h1 = sns.heatmap(data1,cmap="YlGnBu", yticklabels=[0], linewidth=0.01, ax = ax1)
 		h2 = sns.heatmap(data2,cmap="YlGnBu", yticklabels=yticks, linewidth=0.01, ax = ax2)
 		ax1.set_yticks([0]); ax2.set_yticks(yticks)
 		ax2.set_yticklabels(yticks, rotation=0)
-		xticks1 = np.linspace(0, data1.shape[1], 5, dtype=np.int); xticks2 = np.linspace(0, data2.shape[1], 5, dtype=np.int)
+		xticks1 = np.linspace(0, data1.shape[1], 5, dtype=np.int32); xticks2 = np.linspace(0, data2.shape[1], 5, dtype=np.int32)
 		ax1.set_xticks(xticks1); ax2.set_xticks(xticks2); ax2.set_xticklabels(xticks2, rotation=0)
 		ax1.set_xticklabels(xticks1, rotation=0)
 		ax2.set_xlabel('Timestamp'); ax1.set_ylabel(name1)

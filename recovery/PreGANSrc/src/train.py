@@ -42,21 +42,19 @@ def custom_loss(model, source, target_anomaly, target_class):
 def backprop(epoch, model, train_time_data, train_schedule_data, anomaly_data, class_data, optimizer, training = True):
 	global PROTO_UPDATE_FACTOR, num_ones, num_zero
 	num_zero, num_ones = 1, 1
-	if 'Attention' in model.name:
-		aloss_list, tloss_list = [], []
-		for i in tqdm(range(train_time_data.shape[0]), leave=False, position=1):
-			output = model(train_time_data[i], train_schedule_data[i])
-			aloss, tloss = custom_loss(model, output, anomaly_data[i], class_data[i])
-			aloss_list.append(aloss.item()); tloss_list.append(tloss.item())
-			loss = aloss + tloss
-			if training:
-				optimizer.zero_grad()
-				loss.backward()
-				optimizer.step()
-		tqdm.write(f'Epoch {epoch},\tLoss = {np.mean(aloss_list)+np.mean(tloss_list)},\tALoss = {np.mean(aloss_list)},\tTLoss = {np.mean(tloss_list)}')
-		factor = PROTO_UPDATE_FACTOR + PROTO_UPDATE_MIN
-		return np.mean(aloss_list) + np.mean(tloss_list), factor
-	return
+	aloss_list, tloss_list = [], []
+	for i in tqdm(range(train_time_data.shape[0]), leave=False, position=1):
+		output = model(train_time_data[i], train_schedule_data[i])
+		aloss, tloss = custom_loss(model, output, anomaly_data[i], class_data[i])
+		aloss_list.append(aloss.item()); tloss_list.append(tloss.item())
+		loss = aloss + tloss
+		if training:
+			optimizer.zero_grad()
+			loss.backward()
+			optimizer.step()
+	tqdm.write(f'Epoch {epoch},\tLoss = {np.mean(aloss_list)+np.mean(tloss_list)},\tALoss = {np.mean(aloss_list)},\tTLoss = {np.mean(tloss_list)}')
+	factor = PROTO_UPDATE_FACTOR + PROTO_UPDATE_MIN
+	return np.mean(aloss_list) + np.mean(tloss_list), factor
 
 # Accuracy 
 def anomaly_accuracy(source_anomaly, target_anomaly, model_plotter):
@@ -71,7 +69,8 @@ def anomaly_accuracy(source_anomaly, target_anomaly, model_plotter):
 		else:
 			if target_anomaly[i] == 1: fn += 1
 			else: fp += 1
-	model_plotter.update_anomaly(res_list, target_anomaly, correct/len(source_anomaly))
+	if model_plotter is not None:
+		model_plotter.update_anomaly(res_list, target_anomaly, correct/len(source_anomaly))
 	return correct/len(source_anomaly), tp, tn, fp, fn
 
 def class_accuracy(source_prototype, target_anomaly, target_class, model, model_plotter):
@@ -88,7 +87,8 @@ def class_accuracy(source_prototype, target_anomaly, target_class, model, model_
 			if positive_loss <= negative_loss[0] and positive_loss <= negative_loss[1]:
 				correct += 1
 			prototypes.append((sp, target_class[i]))
-	model_plotter.update_class(prototypes, correct/total)
+	if model_plotter is not None:
+		model_plotter.update_class(prototypes, correct/total)
 	return correct / total
 
 def accuracy(model, train_time_data, train_schedule_data, anomaly_data, class_data, model_plotter):
