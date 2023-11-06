@@ -7,7 +7,7 @@ data_filename = 'time_series.npy'
 schedule_filename = 'schedule_series.npy'
 
 # Hyperparameters
-num_epochs = 50
+num_epochs = 30
 PERCENTILES = 98
 PROTO_DIM = 2
 PROTO_UPDATE_FACTOR = 0.2
