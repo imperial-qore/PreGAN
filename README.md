@@ -24,6 +24,8 @@
   </a>
 </div>
 
+> __Note__: This repository is now superseded by [PreGAN+](https://github.com/imperial-qore/PreGANPlus). 
+
 Building a fault-tolerant edge system that can quickly react to node overloads or failures is challenging due to the unreliability of edge devices and the strict service deadlines of modern applications. Moreover, unnecessary task migrations can stress the system network, giving rise to the need for a smart and parsimonious failure recovery scheme. Prior approaches often fail to adapt to highly volatile workloads or accurately detect and diagnose faults for optimal remediation. There is thus a need for a robust and proactive fault-tolerance mechanism to meet service level objectives. In this work, we propose PreGAN, a composite AI model using a Generative Adversarial Network (GAN) to predict preemptive migration decisions for proactive fault-tolerance in containerized edge deployments. PreGAN uses co-simulations in tandem with a GAN to learn a few-shot anomaly classifier and proactively predict migration decisions for reliable computing. Extensive experiments on a Raspberry-Pi based edge environment show that PreGAN can outperform state-of-the-art baseline methods in fault-detection, diagnosis and classification, thus achieving high quality of service. PreGAN accomplishes this by 5.1% more accurate fault detection, higher diagnosis scores and 23.8% lower overheads compared to the best method among the considered baselines.
 
 ## Quick Test
